@@ -36,7 +36,6 @@ nublado2:
         nfs:
           path: /share1/scratch
           server: 10.22.240.130
-    volumes:
       - name: ent-home
         nfs:
           path: /share1/home
