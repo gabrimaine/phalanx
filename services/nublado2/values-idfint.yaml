@@ -36,6 +36,19 @@ nublado2:
         nfs:
           path: /share1/scratch
           server: 10.22.240.130
+    volumes:
+      - name: ent-home
+        nfs:
+          path: /share1/home
+          server: 10.170.166.2
+      - name: ent-project
+        nfs:
+          path: /share1/project
+          server: 10.170.166.2
+      - name: ent-scratch
+        nfs:
+          path: /share1/scratch
+          server: 10.170.166.2
     volume_mounts:
       - name: home
         mountPath: /home
@@ -43,5 +56,11 @@ nublado2:
         mountPath: /project
       - name: scratch
         mountPath: /scratch
+      - name: ent-home
+        mountPath: /enterprise-fs/home
+      - name: ent-project
+        mountPath: /enterprise-fs/project
+      - name: ent-scratch
+        mountPath: /enterprise-fs/scratch
 
   vault_secret_path: "secret/k8s_operator/data-int.lsst.cloud/nublado2"
