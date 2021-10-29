@@ -1,5 +1,7 @@
 argo:
   enabled: false
+alert_stream_schema_registry:
+  enabled: false
 cachemachine:
   enabled: false
 cert_issuer:

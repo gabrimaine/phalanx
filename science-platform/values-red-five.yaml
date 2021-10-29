@@ -4,6 +4,8 @@ vault_path_prefix: secret/k8s_operator/red-five.lsst.codes
 
 argo:
   enabled: true
+alert_stream_schema_registry:
+  enabled: false
 cert_issuer:
   enabled: true
 cert_manager:

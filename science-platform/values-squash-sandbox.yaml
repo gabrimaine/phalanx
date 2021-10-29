@@ -4,6 +4,8 @@ vault_path_prefix: secret/k8s_operator/squash-sandbox.lsst.codes
 
 argo:
   enabled: false
+alert_stream_schema_registry:
+  enabled: false
 cert_issuer:
   enabled: true
 cert_manager:

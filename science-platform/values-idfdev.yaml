@@ -4,6 +4,8 @@ vault_path_prefix: secret/k8s_operator/data-dev.lsst.cloud
 
 argo:
   enabled: true
+alert_stream_schema_registry:
+  enabled: false
 cachemachine:
   enabled: true
 cert_issuer:
