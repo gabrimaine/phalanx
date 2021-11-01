@@ -5,6 +5,11 @@ nublado2:
         requests:
           cpu: 300m
           memory: 512Mi
+      livenessProbe:
+        timeoutSeconds: 10
+      readinessProbe:
+        periodSeconds: 20
+        timeoutSeconds: 10
     ingress:
       hosts: ["data-dev.lsst.cloud"]
       annotations:
