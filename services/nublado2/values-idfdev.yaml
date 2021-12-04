@@ -23,17 +23,14 @@ nublado2:
       AUTO_REPO_SPECS: https://github.com/lsst-sqre/system-test@prod,https://github.com/rubin-dp0/tutorial-notebooks@prod
     volumes:
       - name: home
-        nfs:
-          path: /share1/home
-          server: 10.87.86.26
+        persistentVolumeClaim:
+          claimName: csi-home-pvc
       - name: project
-        nfs:
-          path: /share1/project
-          server: 10.87.86.26
+        persistentVolumeClaim:
+          claimName: csi-project-pvc
       - name: scratch
-        nfs:
-          path: /share1/scratch
-          server: 10.87.86.26
+        persistentVolumeClaim:
+          claimName: csi-scratch-pvc
     volume_mounts:
       - name: home
         mountPath: /home
