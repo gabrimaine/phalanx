@@ -286,7 +286,6 @@ nublado2:
             limits.memory: 27Gi
       - apiVersion: v1
         kind: PersistentVolumeClaim
-        apiVersion: v1
         metadata:
           name: csi-home-pvc
         spec:
@@ -299,7 +298,6 @@ nublado2:
             volumeName: csi-home-pv
       - apiVersion: v1
         kind: PersistentVolumeClaim
-        apiVersion: v1
         metadata:
           name: csi-project-pvc
         spec:
@@ -312,7 +310,6 @@ nublado2:
             volumeName: csi-project-pv
       - apiVersion: v1
         kind: PersistentVolumeClaim
-        apiVersion: v1
         metadata:
           name: csi-scratch-pvc
         spec:
