@@ -296,7 +296,7 @@ nublado2:
           resources:
             requests:
               storage: 2.5Ti
-            volumeName: csi-home-pv
+            volumeName: "csi-home-pv-{{ user_namespace }}"
       - apiVersion: v1
         kind: PersistentVolumeClaim
         metadata:
@@ -309,7 +309,7 @@ nublado2:
           resources:
             requests:
               storage: 2.5Ti
-            volumeName: csi-project-pv
+            volumeName: "csi-project-pv-{{ user_namespace }}"
       - apiVersion: v1
         kind: PersistentVolumeClaim
         metadata:
@@ -322,6 +322,71 @@ nublado2:
           resources:
             requests:
               storage: 2.5Ti
-            volumeName: csi-scratch-pv
-
+            volumeName: "csi-scratch-pv-{{ user_namespace }}"
+      - apiVersion: v1
+        kind: PersistentVolume
+        metadata:
+          name: "csi-home-pv-{{ user_namespace }}"
+          annotations:
+            pv.kubernetes.io/provisioned-by: filestore.csi.storage.gke.io
+        spec:
+          storageClassName: csi-filestore
+          capacity:
+            storage: 2.5Ti
+          accessModes:
+            - ReadWriteMany
+          # Don't worry, this doesn't delete the underlying NFS data
+          persistentVolumeReclaimPolicy: Delete
+          volumeMode: Filesystem
+          csi:
+            driver: filestore.csi.storage.gke.io
+            # Modify this to use the zone, filestore instance and share name.
+            volumeHandle: "modeInstance/us-central1-b/csi-home/csi_home"
+            volumeAttributes:
+              ip: 10.161.1.2
+              volume: csi_home
+      - apiVersion: v1
+        kind: PersistentVolume
+        metadata:
+          name: "csi-project-pv-{{ user_namespace }}"
+          annotations:
+            pv.kubernetes.io/provisioned-by: filestore.csi.storage.gke.io
+        spec:
+          storageClassName: csi-filestore
+          capacity:
+            storage: 2.5Ti
+          accessModes:
+            - ReadWriteMany
+          # Don't worry, this doesn't delete the underlying NFS data
+          persistentVolumeReclaimPolicy: Delete
+          volumeMode: Filesystem
+          csi:
+            driver: filestore.csi.storage.gke.io
+            # Modify this to use the zone, filestore instance and share name.
+            volumeHandle: "modeInstance/us-central1-b/csi-project/csi_project"
+            volumeAttributes:
+              ip: 10.161.1.10
+              volume: csi_project
+      - apiVersion: v1
+        kind: PersistentVolume
+        metadata:
+          name: "csi-scratch-pv-{{ user_namespace }}"
+          annotations:
+            pv.kubernetes.io/provisioned-by: filestore.csi.storage.gke.io
+        spec:
+          storageClassName: csi-filestore
+          capacity:
+            storage: 2.5Ti
+          accessModes:
+            - ReadWriteMany
+          # Don't worry, this doesn't delete the underlying NFS data
+          persistentVolumeReclaimPolicy: Delete
+          volumeMode: Filesystem
+          csi:
+            driver: filestore.csi.storage.gke.io
+            # Modify this to use the zone, filestore instance and share name.
+            volumeHandle: "modeInstance/us-central1-b/csi-scratch/csi_scratch"
+            volumeAttributes:
+              ip: 10.161.1.18
+              volume: csi_scratch
   vault_secret_path: "secret/k8s_operator/data-dev.lsst.cloud/nublado2"
