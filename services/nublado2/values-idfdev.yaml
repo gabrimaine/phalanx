@@ -288,6 +288,7 @@ nublado2:
         kind: PersistentVolumeClaim
         metadata:
           name: csi-home-pvc
+          namespace: "{{ user_namespace }}"
         spec:
           accessModes:
             - ReadWriteMany
@@ -300,6 +301,7 @@ nublado2:
         kind: PersistentVolumeClaim
         metadata:
           name: csi-project-pvc
+          namespace: "{{ user_namespace }}"
         spec:
           accessModes:
             - ReadWriteMany
@@ -312,6 +314,7 @@ nublado2:
         kind: PersistentVolumeClaim
         metadata:
           name: csi-scratch-pvc
+          namespace: "{{ user_namespace }}"
         spec:
           accessModes:
             - ReadWriteMany
