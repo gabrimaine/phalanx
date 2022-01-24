@@ -45,7 +45,7 @@ semaphore:
 sherlock:
   enabled: false
 squareone:
-  enabled: false
+  enabled: true
 squash_api:
   enabled: false
 strimzi:
