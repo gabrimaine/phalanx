@@ -39,7 +39,7 @@ plot_navigator:
 portal:
   enabled: false
 postgres:
-  enabled: false
+  enabled: true
 semaphore:
   enabled: false
 sherlock:
