@@ -5,15 +5,15 @@ vault_path_prefix: secret/k8s_operator/minikube.lsst.codes
 alert_stream_broker:
   enabled: false
 cachemachine:
-  enabled: true
+  enabled: false
 cert_issuer:
   enabled: false
 cert_manager:
-  enabled: true
+  enabled: false
 chronograf:
   enabled: false
 datalinker:
-  enabled: true
+  enabled: false
 exposurelog:
   enabled: false
 gafaelfawr:
@@ -23,29 +23,29 @@ influxdb:
 kapacitor:
   enabled: false
 mobu:
-  enabled: true
+  enabled: false
 moneypenny:
-  enabled: true
+  enabled: false
 ingress_nginx:
-  enabled: true
+  enabled: false
 noteburst:
-  enabled: true
+  enabled: false
 nublado2:
-  enabled: true
+  enabled: false
 obstap:
-  enabled: true
+  enabled: false
 plot_navigator:
   enabled: false
 portal:
-  enabled: true
+  enabled: false
 postgres:
-  enabled: true
+  enabled: false
 semaphore:
-  enabled: true
+  enabled: false
 sherlock:
-  enabled: true
+  enabled: false
 squareone:
-  enabled: true
+  enabled: false
 squash_api:
   enabled: false
 strimzi:
@@ -53,9 +53,9 @@ strimzi:
 strimzi_registry_operator:
   enabled: false
 tap:
-  enabled: true
+  enabled: false
 tap_schema:
-  enabled: true
+  enabled: false
 vault_secrets_operator:
   enabled: true
 vo_cutouts:
