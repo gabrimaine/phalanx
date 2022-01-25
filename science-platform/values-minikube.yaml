@@ -29,7 +29,7 @@ moneypenny:
 ingress_nginx:
   enabled: false
 noteburst:
-  enabled: false
+  enabled: true
 nublado2:
   enabled: false
 obstap:
