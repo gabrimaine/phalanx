@@ -41,7 +41,7 @@ telegraf-ds:
       [[inputs.kube_inventory]]
         url = "https://kubernetes.default.svc"
         bearer_token = "/run/secrets/kubernetes.io/serviceaccount/token"
-        resource_include = [ "pods"]
+        resource_include = [ "pods", "persistent_volumes", "nodes" ]
         insecure_skip_verify = true
         namespace = ""
       [[outputs.influxdb_v2]]
