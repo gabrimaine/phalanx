@@ -1,4 +1,4 @@
-telegraf:
+telegraf-ds:
   config:
     global_tags:
       cluster: data-dev.lsst.cloud
