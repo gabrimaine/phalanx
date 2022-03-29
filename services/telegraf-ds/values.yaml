@@ -6,23 +6,12 @@ telegraf-ds:
         secretKeyRef:
           name: telegraf
           key: influx-token
-  config:
-    global_tags:
-      # -- Cluster name -- should be same as FQDN of RSP endpoint
-      # @default -- None, must be set
-      cluster: ""
-      # -- Set for differentiation of Telegraf service from
-      # Telegraf-daemonset
-      daemonset: "true"
-    outputs:
-      - influxdb_v2:
-          urls:
-            - "https://monitoring.lsst.codes"
-          bucket: "monitoring"
-          token: "$INFLUX_TOKEN"
-          organization: "square"
+  # Ugh, you have to duplicate this with cluster set at each site.
   override_config:
     toml: |+
+      [global_tags]
+        cluster = ""
+        daemonset = "true"
       [agent]
         interval = "10s"
         round_interval = true
