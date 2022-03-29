@@ -31,6 +31,7 @@ telegraf-ds:
       [[inputs.disk]]
         ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
       [[inputs.kubernetes]]
+        url = "http://127.0.0.1:10255"
         insecure_skip_verify = true
       [[outputs.influxdb_v2]]
         bucket = "monitoring"
