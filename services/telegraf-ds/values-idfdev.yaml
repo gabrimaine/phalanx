@@ -30,9 +30,10 @@ telegraf-ds:
         report_active = false
       [[inputs.disk]]
         ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
-      [[inputs.kubernetes]]
+      [[inputs.kube_inventory]]
         url = "https://kubernetes.default.svc"
         insecure_skip_verify = true
+        resource_include = [ "pods" ]
       [[outputs.influxdb_v2]]
         bucket = "monitoring"
         organization = "square"
