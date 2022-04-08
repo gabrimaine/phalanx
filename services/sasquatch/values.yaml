@@ -12,7 +12,7 @@ influxdb:
   # -- InfluxDB image tag.
   image:
     tag: "1.8.10"
-  # -- Default InfluxDB user, use influxb-user and influxdb-password keys from secret.
+  # -- Default InfluxDB user, use influxdb-user and influxdb-password keys from secret.
   setDefaultUser:
     enabled: true
     user:
@@ -79,6 +79,12 @@ chronograf:
     HOST_PAGE_DISABLED: true
     BASE_PATH: /chronograf
     CUSTOM_AUTO_REFRESH: "1s=1000"
+    INFLUXDB_URL: http://sasquatch-influxdb.sasquatch:8086
+
+  # -- InfluxDB connection env variables, expected keys influxdb-user and influxdb-password.
+  influxdb:
+    existingSecret: "sasquatch"
+
   # -- Chronograf secrets, expected keys generic_client_id, generic_client_secret and token_secret.
   envFromSecret: "sasquatch"
 
