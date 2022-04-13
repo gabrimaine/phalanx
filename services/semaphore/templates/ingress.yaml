@@ -19,7 +19,7 @@ spec:
             pathType: "Prefix"
             backend:
               service:
-                name: {{ template "noteburst.fullname" . }}
+                name: {{ template "semaphore.fullname" . }}
                 port:
                   number: 80
 {{- end }}
