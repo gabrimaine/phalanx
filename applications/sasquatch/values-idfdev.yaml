@@ -54,7 +54,7 @@ strimzi-kafka:
 
 influxdb:
   ingress:
-    enabled: true
+    enabled: false
     hostname: data-dev.lsst.cloud
   resources:
     requests:
@@ -63,6 +63,10 @@ influxdb:
     limits:
       memory: 16Gi
       cpu: 2
+
+customInfluxDBIngress:
+  enabled: true
+  hostname: data-dev.lsst.cloud
 
 influxdb-enterprise:
   enabled: true
@@ -120,7 +124,7 @@ telegraf-kafka-consumer:
         [ "lsst.Test.*" ]
 
 kafdrop:
-  cmdArgs: "--message.format=AVRO --topic.deleteEnabled=true --topic.createEnabled=true"
+  cmdArgs: "--message.format=AVRO --message.keyFormat=DEFAULT --topic.deleteEnabled=true --topic.createEnabled=true"
   ingress:
     enabled: true
     hostname: data-dev.lsst.cloud
@@ -159,3 +163,27 @@ app-metrics:
   apps:
     - gafaelfawr
     - mobu
+    - nublado
+    - wobbly
+
+backup:
+  enabled: true
+  persistence:
+    size: 500Gi
+    storageClass: standard
+  backupItems:
+    - name: "chronograf"
+      enabled: true
+      retentionDays: 3
+    - name: "kapacitor"
+      enabled: true
+      retentionDays: 3
+    - name: "influxdb-enterprise-incremental"
+      enabled: true
+    - name: "influxdb-oss-full"
+      enabled: true
+      retentionDays: 3
+  restoreItems:
+    - name: "influxdb-oss-full"
+      enabled: true
+      backupTimestamp: "20250113T030120Z"

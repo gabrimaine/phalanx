@@ -16,17 +16,17 @@
 | applications.cm-service | bool | `false` | Enable the cm-service application |
 | applications.control-system-test | bool | `false` | Enable the control-system-test application |
 | applications.datalinker | bool | `false` | Eanble the datalinker application |
-| applications.eas | bool | `false` | Enable the eas control system application |
+| applications.envsys | bool | `false` | Enable the envsys control system application |
 | applications.exposurelog | bool | `false` | Enable the exposurelog application |
 | applications.fastapi-bootcamp | bool | `false` | Enable the fastapi-bootcamp application |
 | applications.filestore-backup | bool | `false` | Enable the filestore-backup application |
+| applications.flink | bool | `false` | Enable the flink application |
 | applications.gafaelfawr | bool | `true` | Enable the Gafaelfawr application. This is required by Phalanx since most other applications use `GafaelfawrIngress` |
 | applications.ghostwriter | bool | `false` | Enable the ghostwriter application |
 | applications.giftless | bool | `false` | Enable the giftless application |
 | applications.hips | bool | `false` | Enable the HiPS application |
 | applications.ingress-nginx | bool | `true` | Enable the ingress-nginx application. This is required for all environments, but is still configurable because currently USDF uses an unsupported configuration with ingress-nginx deployed in a different cluster. |
 | applications.jira-data-proxy | bool | `false` | Enable the jira-data-proxy application |
-| applications.kubernetes-replicator | bool | `false` | Enable the kubernetes-replicator application |
 | applications.livetap | bool | `false` | Enable the livetap application |
 | applications.love | bool | `false` | Enable the love control system application |
 | applications.mobu | bool | `false` | Enable the mobu application |
@@ -53,12 +53,12 @@
 | applications.prompt-proto-service-lsstcomcamsim | bool | `false` | Enable the prompt-proto-service-lsstcomcamsim application |
 | applications.rubintv | bool | `false` | Enable the rubintv application |
 | applications.rubintv-dev | bool | `false` | Enable the rubintv-dev application |
+| applications.s3proxy | bool | `false` | Enable the s3proxy application |
 | applications.sasquatch | bool | `false` | Enable the sasquatch application |
 | applications.sasquatch-backpack | bool | `false` | Enable the sasquatch-backpack application |
 | applications.schedview-snapshot | bool | `false` | Enable the schedview-snapshot application |
 | applications.semaphore | bool | `false` | Enable the semaphore application |
 | applications.sia | bool | `false` | Enable the sia over butler application |
-| applications.siav2 | bool | `false` | Enable the siav2 application |
 | applications.simonyitel | bool | `false` | Enable the simonyitel control system application |
 | applications.sqlproxy-cross-project | bool | `false` | Enable the sqlproxy-cross-project application |
 | applications.sqrbot-sr | bool | `false` | Enable the sqrbot-sr application |
@@ -68,6 +68,7 @@
 | applications.strimzi | bool | `false` | Enable the strimzi application |
 | applications.strimzi-access-operator | bool | `false` | Enable the strimzi-access-operator application |
 | applications.tap | bool | `false` | Enable the tap application |
+| applications.tasso | bool | `false` | Enable the tasso application |
 | applications.telegraf | bool | `false` | Enable the telegraf application |
 | applications.telegraf-ds | bool | `false` | Enable the telegraf-ds application |
 | applications.templatebot | bool | `false` | Enable the templatebot application |
@@ -77,10 +78,11 @@
 | applications.vault | bool | `false` | Enable the vault application. This is the actual vault storage and there should only be one production and one development instance globally. |
 | applications.vault-secrets-operator | bool | `true` | Enable the vault-secrets-operator application. This is required for all environments. |
 | applications.vo-cutouts | bool | `false` | Enable the vo-cutouts application |
+| applications.wobbly | bool | `false` | Enable the wobbly application, required if the environment will be running any Safir-based UWS services |
 | butlerServerRepositories | object | None, must be set | Butler repositories that can be accessed via Butler server, as a dictionary from repository label to URI. |
 | controlSystem.appNamespace | string | None, must be set | Application namespacce for the control system deployment |
 | controlSystem.imageTag | string | None, must be set | Image tag for the control system deployment |
-| controlSystem.kafkaBrokerAddress | string | `"sasquatch-kafka-brokers.sasquatch:9092"` | Kafka broker address for the control system deployment |
+| controlSystem.kafkaBrokerAddress | string | `"sasquatch-kafka-bootstrap.sasquatch:9092"` | Kafka broker address for the control system deployment |
 | controlSystem.kafkaTopicReplicationFactor | int | `3` | Kafka topic replication factor for control system topics |
 | controlSystem.s3EndpointUrl | string | None, must be set: "" | S3 endpoint (LFA) for the control system deployment |
 | controlSystem.schemaRegistryUrl | string | `"http://sasquatch-schema-registry.sasquatch:8081"` | Schema registry URL for the control system deployment |

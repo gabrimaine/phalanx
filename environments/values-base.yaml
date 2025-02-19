@@ -15,7 +15,7 @@ applications:
   calsys: true
   consdb: true
   control-system-test: true
-  eas: true
+  envsys: true
   exposurelog: true
   love: true
   mobu: true
@@ -35,6 +35,6 @@ applications:
   uws: true
 
 controlSystem:
-  imageTag: "k0002"
+  imageTag: "k0004"
   siteTag: "base"
   s3EndpointUrl: "https://s3.ls.lsst.org"

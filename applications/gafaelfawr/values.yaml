@@ -19,10 +19,10 @@ image:
 resources:
   limits:
     cpu: "1"
-    memory: "300Mi"
+    memory: "400Mi"
   requests:
     cpu: "100m"
-    memory: "150Mi"
+    memory: "210Mi"
 
 # -- Affinity rules for the Gafaelfawr frontend pod
 affinity: {}
@@ -50,6 +50,11 @@ config:
   # @default -- None, must be set if neither `cloudsql.enabled` nor
   # `config.internalDatabase` are true
   databaseUrl: null
+
+  # -- Whether to send trace and telemetry information to Sentry. This traces
+  # every call and therefore should only be enabled in non-production
+  # environments.
+  enableSentry: false
 
   # -- HTML footer to add to any login error page (will be enclosed in a <p>
   # tag).
@@ -311,14 +316,10 @@ cloudsql:
     repository: "gcr.io/cloudsql-docker/gce-proxy"
 
     # -- Cloud SQL Auth Proxy tag to use
-    tag: "1.37.1"
-
-    # -- Tag suffix to use for the proxy for schema updates
-    schemaUpdateTagSuffix: "-alpine"
+    tag: "1.37.4"
 
     # -- Pull policy for Cloud SQL Auth Proxy images
     pullPolicy: "IfNotPresent"
-
 
   # -- Instance connection name for a Cloud SQL PostgreSQL instance
   # @default -- None, must be set if Cloud SQL Auth Proxy is enabled
@@ -329,7 +330,7 @@ cloudsql:
   # @default -- None, must be set if Cloud SQL Auth Proxy is enabled
   serviceAccount: ""
 
-  # -- Resource limits and requests for the Cloud SQL Proxy pod
+  # -- Resource limits and requests for the Cloud SQL Proxy container
   # @default -- See `values.yaml`
   resources:
     limits:
@@ -339,17 +340,17 @@ cloudsql:
       cpu: "5m"
       memory: "7Mi"
 
-  # -- Annotations for the Cloud SQL Proxy pod
-  podAnnotations: {}
+  # -- Affinity rules for the standalone Cloud SQL Proxy pod
+  affinity: {}
 
-  # -- Node selection rules for the Cloud SQL Proxy pod
+  # -- Node selection rules for the standalone Cloud SQL Proxy pod
   nodeSelector: {}
 
-  # -- Tolerations for the Cloud SQL Proxy pod
-  tolerations: []
+  # -- Annotations for the standalone Cloud SQL Proxy pod
+  podAnnotations: {}
 
-  # -- Affinity rules for the Cloud SQL Proxy pod
-  affinity: {}
+  # -- Tolerations for the standalone Cloud SQL Proxy pod
+  tolerations: []
 
 maintenance:
   # -- Cron schedule string for Gafaelfawr data consistency audit (in UTC)
@@ -371,10 +372,10 @@ maintenance:
   resources:
     limits:
       cpu: "1"
-      memory: "300Mi"
+      memory: "1Gi"
     requests:
       cpu: "100m"
-      memory: "150Mi"
+      memory: "175Mi"
 
   # -- Annotations for Gafaelfawr maintenance and audit pods
   podAnnotations: {}
@@ -396,10 +397,10 @@ operator:
   resources:
     limits:
       cpu: "500m"
-      memory: "500Mi"
+      memory: "1Gi"
     requests:
       cpu: "10m"
-      memory: "150Mi"
+      memory: "175Mi"
 
   # -- Annotations for the token management pod
   podAnnotations: {}
@@ -412,6 +413,42 @@ operator:
 
   # -- Affinity rules for the token management pod
   affinity: {}
+
+redis-ephemeral:
+  config:
+    # -- Name of secret containing Redis password (do not change)
+    secretName: "gafaelfawr"
+
+    # -- Key inside secret from which to get the Redis password (do not
+    # change)
+    secretKey: "redis-password"
+
+  persistence:
+    # -- Whether to persist Redis storage of ephemeral data. This should
+    # always be false.
+    enabled: false
+
+  # -- Resource limits and requests for the ephemeral Redis pod
+  # @default -- See `values.yaml`
+  resources:
+    limits:
+      cpu: "1"
+      memory: "40Mi"
+    requests:
+      cpu: "50m"
+      memory: "15Mi"
+
+  # -- Affinity rules for the ephemeral Redis pod
+  affinity: {}
+
+  # -- Node selection rules for the ephemeral Redis pod
+  nodeSelector: {}
+
+  # -- Pod annotations for the ephemeral Redis pod
+  podAnnotations: {}
+
+  # -- Tolerations for the ephemeral Redis pod
+  tolerations: []
 
 redis:
   config:
@@ -441,27 +478,27 @@ redis:
     # size, storageClass, and accessMode settings are ignored.
     volumeClaimName: ""
 
-  # -- Resource limits and requests for the Redis pod
+  # -- Resource limits and requests for the persistent Redis pod
   # @default -- See `values.yaml`
   resources:
     limits:
       cpu: "1"
-      memory: "40Mi"
+      memory: "200Mi"
     requests:
       cpu: "50m"
-      memory: "6Mi"
+      memory: "100Mi"
 
-  # -- Pod annotations for the Redis pod
-  podAnnotations: {}
+  # -- Affinity rules for the persistent Redis pod
+  affinity: {}
 
-  # -- Node selection rules for the Redis pod
+  # -- Node selection rules for the persistent Redis pod
   nodeSelector: {}
 
-  # -- Tolerations for the Redis pod
-  tolerations: []
+  # -- Pod annotations for the persistent Redis pod
+  podAnnotations: {}
 
-  # -- Affinity rules for the Redis pod
-  affinity: {}
+  # -- Tolerations for the persistent Redis pod
+  tolerations: []
 
 # The following will be set by parameters injected by Argo CD and should not
 # be set in the individual environment values files.

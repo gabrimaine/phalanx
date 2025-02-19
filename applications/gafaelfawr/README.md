@@ -13,18 +13,17 @@ Authentication and identity system
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity rules for the Gafaelfawr frontend pod |
-| cloudsql.affinity | object | `{}` | Affinity rules for the Cloud SQL Proxy pod |
+| cloudsql.affinity | object | `{}` | Affinity rules for the standalone Cloud SQL Proxy pod |
 | cloudsql.enabled | bool | `false` | Enable the Cloud SQL Auth Proxy, used with Cloud SQL databases on Google Cloud. This will be run as a sidecar for the main Gafaelfawr pods, and as a separate service (behind a `NetworkPolicy`) for other, lower-traffic services. |
 | cloudsql.image.pullPolicy | string | `"IfNotPresent"` | Pull policy for Cloud SQL Auth Proxy images |
 | cloudsql.image.repository | string | `"gcr.io/cloudsql-docker/gce-proxy"` | Cloud SQL Auth Proxy image to use |
-| cloudsql.image.schemaUpdateTagSuffix | string | `"-alpine"` | Tag suffix to use for the proxy for schema updates |
-| cloudsql.image.tag | string | `"1.37.1"` | Cloud SQL Auth Proxy tag to use |
+| cloudsql.image.tag | string | `"1.37.4"` | Cloud SQL Auth Proxy tag to use |
 | cloudsql.instanceConnectionName | string | None, must be set if Cloud SQL Auth Proxy is enabled | Instance connection name for a Cloud SQL PostgreSQL instance |
-| cloudsql.nodeSelector | object | `{}` | Node selection rules for the Cloud SQL Proxy pod |
-| cloudsql.podAnnotations | object | `{}` | Annotations for the Cloud SQL Proxy pod |
-| cloudsql.resources | object | See `values.yaml` | Resource limits and requests for the Cloud SQL Proxy pod |
+| cloudsql.nodeSelector | object | `{}` | Node selection rules for the standalone Cloud SQL Proxy pod |
+| cloudsql.podAnnotations | object | `{}` | Annotations for the standalone Cloud SQL Proxy pod |
+| cloudsql.resources | object | See `values.yaml` | Resource limits and requests for the Cloud SQL Proxy container |
 | cloudsql.serviceAccount | string | None, must be set if Cloud SQL Auth Proxy is enabled | The Google service account that has an IAM binding to the `gafaelfawr` Kubernetes service account and has the `cloudsql.client` role |
-| cloudsql.tolerations | list | `[]` | Tolerations for the Cloud SQL Proxy pod |
+| cloudsql.tolerations | list | `[]` | Tolerations for the standalone Cloud SQL Proxy pod |
 | config.afterLogoutUrl | string | Top-level page of this Phalanx environment | Where to send the user after they log out |
 | config.baseInternalUrl | string | FQDN under `svc.cluster.local` | URL for direct connections to the Gafaelfawr service, bypassing the Ingress. Must use a service name of `gafaelfawr` and port 8080. |
 | config.cilogon.clientId | string | `nil` | CILogon client ID. One and only one of this, `config.github.clientId`, or `config.oidc.clientId` must be set. |
@@ -33,6 +32,7 @@ Authentication and identity system
 | config.cilogon.test | bool | `false` | Whether to use the test instance of CILogon |
 | config.cilogon.usernameClaim | string | `"username"` | Claim from which to get the username |
 | config.databaseUrl | string | None, must be set if neither `cloudsql.enabled` nor | URL for the PostgreSQL database `config.internalDatabase` are true |
+| config.enableSentry | bool | `false` | Whether to send trace and telemetry information to Sentry. This traces every call and therefore should only be enabled in non-production environments. |
 | config.errorFooter | string | `nil` | HTML footer to add to any login error page (will be enclosed in a <p> tag). |
 | config.firestore.project | string | Firestore support is disabled | If set, assign UIDs and GIDs using Google Firestore in the given project. Cloud SQL must be enabled and the Cloud SQL service account must have read/write access to that Firestore instance. |
 | config.github.clientId | string | `nil` | GitHub client ID. One and only one of this, `config.cilogon.clientId`, or `config.oidc.clientId` must be set. |
@@ -102,18 +102,26 @@ Authentication and identity system
 | operator.resources | object | See `values.yaml` | Resource limits and requests for the Gafaelfawr Kubernetes operator. The limits are artificially higher since the operator pod is also where we manually run `gafaelfawr audit --fix`, which requires more CPU and memory. |
 | operator.tolerations | list | `[]` | Tolerations for the token management pod |
 | podAnnotations | object | `{}` | Annotations for the Gafaelfawr frontend pod |
-| redis.affinity | object | `{}` | Affinity rules for the Redis pod |
+| redis-ephemeral.affinity | object | `{}` | Affinity rules for the ephemeral Redis pod |
+| redis-ephemeral.config.secretKey | string | `"redis-password"` | Key inside secret from which to get the Redis password (do not change) |
+| redis-ephemeral.config.secretName | string | `"gafaelfawr"` | Name of secret containing Redis password (do not change) |
+| redis-ephemeral.nodeSelector | object | `{}` | Node selection rules for the ephemeral Redis pod |
+| redis-ephemeral.persistence.enabled | bool | `false` | Whether to persist Redis storage of ephemeral data. This should always be false. |
+| redis-ephemeral.podAnnotations | object | `{}` | Pod annotations for the ephemeral Redis pod |
+| redis-ephemeral.resources | object | See `values.yaml` | Resource limits and requests for the ephemeral Redis pod |
+| redis-ephemeral.tolerations | list | `[]` | Tolerations for the ephemeral Redis pod |
+| redis.affinity | object | `{}` | Affinity rules for the persistent Redis pod |
 | redis.config.secretKey | string | `"redis-password"` | Key inside secret from which to get the Redis password (do not change) |
 | redis.config.secretName | string | `"gafaelfawr"` | Name of secret containing Redis password (do not change) |
-| redis.nodeSelector | object | `{}` | Node selection rules for the Redis pod |
+| redis.nodeSelector | object | `{}` | Node selection rules for the persistent Redis pod |
 | redis.persistence.accessMode | string | `"ReadWriteOnce"` | Access mode of storage to request |
 | redis.persistence.enabled | bool | `true` | Whether to persist Redis storage and thus tokens. Setting this to false will use `emptyDir` and reset all tokens on every restart. Only use this for a test deployment. |
 | redis.persistence.size | string | `"1Gi"` | Amount of persistent storage to request |
 | redis.persistence.storageClass | string | `""` | Class of storage to request |
 | redis.persistence.volumeClaimName | string | `""` | Use an existing PVC, not dynamic provisioning. If this is set, the size, storageClass, and accessMode settings are ignored. |
-| redis.podAnnotations | object | `{}` | Pod annotations for the Redis pod |
-| redis.resources | object | See `values.yaml` | Resource limits and requests for the Redis pod |
-| redis.tolerations | list | `[]` | Tolerations for the Redis pod |
+| redis.podAnnotations | object | `{}` | Pod annotations for the persistent Redis pod |
+| redis.resources | object | See `values.yaml` | Resource limits and requests for the persistent Redis pod |
+| redis.tolerations | list | `[]` | Tolerations for the persistent Redis pod |
 | replicaCount | int | `1` | Number of web frontend pods to start |
 | resources | object | See `values.yaml` | Resource limits and requests for the Gafaelfawr frontend pod |
 | tolerations | list | `[]` | Tolerations for the Gafaelfawr frontend pod |

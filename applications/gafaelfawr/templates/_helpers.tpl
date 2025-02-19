@@ -27,6 +27,35 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Cloud SQL Auth Proxy sidecar container
+*/}}
+{{- define "gafaelfawr.cloudsqlSidecar" -}}
+- name: "cloud-sql-proxy"
+  command:
+    - "/cloud_sql_proxy"
+    - "-ip_address_types=PRIVATE"
+    - "-log_debug_stdout=true"
+    - "-structured_logs=true"
+    - "-instances={{ required "cloudsql.instanceConnectionName must be specified" .Values.cloudsql.instanceConnectionName }}=tcp:5432"
+  image: "{{ .Values.cloudsql.image.repository }}:{{ .Values.cloudsql.image.tag }}"
+  imagePullPolicy: {{ .Values.cloudsql.image.pullPolicy | quote }}
+  {{- with .Values.cloudsql.resources }}
+  resources:
+    {{- toYaml . | nindent 12 }}
+  {{- end }}
+  restartPolicy: "Always"
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - "all"
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+{{- end }}
+
+{{/*
 Common environment variables
 */}}
 {{- define "gafaelfawr.envVars" -}}
@@ -115,7 +144,9 @@ Common environment variables
     secretKeyRef:
       name: "gafaelfawr"
       key: "redis-password"
-- name: "GAFAELFAWR_REDIS_URL"
+- name: "GAFAELFAWR_REDIS_EPHEMERAL_URL"
+  value: "redis://gafaelfawr-redis-ephemeral.{{ .Release.Namespace }}:6379/0"
+- name: "GAFAELFAWR_REDIS_PERSISTENT_URL"
   value: "redis://gafaelfawr-redis.{{ .Release.Namespace }}:6379/0"
 - name: "GAFAELFAWR_SESSION_SECRET"
   valueFrom:
@@ -140,5 +171,16 @@ Common environment variables
     secretKeyRef:
       name: "gafaelfawr-kafka"
       key: "securityProtocol"
+{{- end }}
+{{- if .Values.config.enableSentry }}
+- name: SENTRY_DSN
+  valueFrom:
+    secretKeyRef:
+      name: "gafaelfawr"
+      key: "sentry-dsn"
+- name: SENTRY_RELEASE
+  value: {{ .Chart.Name }}@{{ .Chart.AppVersion }}
+- name: SENTRY_ENVIRONMENT
+  value: {{ .Values.global.host }}
 {{- end }}
 {{- end }}

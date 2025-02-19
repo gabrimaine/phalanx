@@ -1,6 +1,9 @@
 config:
   logLevel: DEBUG
   profile: development
+  metrics:
+    enabled: true
+  sentryTracesSampleConfig: errors
   githubRefreshApp:
     acceptedGithubOrgs:
       - lsst-sqre

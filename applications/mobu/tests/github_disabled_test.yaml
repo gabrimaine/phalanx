@@ -14,11 +14,22 @@ tests:
           path: "data['config.yaml']"
           value: |
             autostart: []
+            availableServices: []
             githubCiApp: null
             githubRefreshApp: null
             logLevel: INFO
+            metrics:
+              application: mobu
+              enabled: false
+              events:
+                topicPrefix: lsst.square.metrics.events
+              schemaManager:
+                registryUrl: http://sasquatch-schema-registry.sasquatch.svc.cluster.local:8081
+                suffix: ""
             pathPrefix: /mobu
             profile: production
+            sentryEnvironment: null
+            sentryTracesSampleConfig: 0
             slackAlerts: true
   - it: "Should not inject GitHub CI app secrets into the Deployment env"
     template: "deployment.yaml"

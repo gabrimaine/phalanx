@@ -3,6 +3,7 @@ fqdn: "data-dev.lsst.cloud"
 appOfAppsName: "science-platform"
 butlerServerRepositories:
   dp02: "https://data-dev.lsst.cloud/api/butler/repo/dp02/butler.yaml"
+  dp1: "https://data-dev.lsst.cloud/api/butler/repo/dp1/butler.yaml"
 gcp:
   projectId: "science-platform-dev-7696"
   region: "us-central1"
@@ -16,6 +17,7 @@ applications:
   butler: true
   datalinker: true
   filestore-backup: true
+  flink: true
   ghostwriter: true
   hips: true
   jira-data-proxy: true
@@ -26,7 +28,6 @@ applications:
   sasquatch: true
   semaphore: true
   sia: true
-  siav2: false
   ssotap: true
   squareone: true
   sqlproxy-cross-project: true
@@ -38,3 +39,4 @@ applications:
   times-square: true
   vault-secrets-operator: true
   vo-cutouts: true
+  wobbly: true

@@ -4,6 +4,12 @@ controller:
   config:
     fileserver:
       enabled: true
+      nodeSelector:
+        node_pool: "user-lab-pool"
+      tolerations:
+        - key: "nublado.lsst.io/permitted"
+          operator: "Exists"
+          effect: "NoExecute"
       volumeMounts:
         - containerPath: "/home"
           volumeName: "home"
@@ -38,11 +44,13 @@ controller:
         - name: "inithome"
           image:
             repository: "ghcr.io/lsst-sqre/nublado-inithome"
-            tag: "6.3.0"
+            tag: "8.4.1"
           privileged: true
           volumeMounts:
             - containerPath: "/home"
               volumeName: "home"
+      nodeSelector:
+        node_pool: "user-lab-pool"
       secrets:
         - secretName: "nublado-lab-secret"
           secretKey: "aws-credentials.ini"
@@ -65,6 +73,10 @@ controller:
         - size: huge
           cpu: 8.0
           memory: 32Gi
+      tolerations:
+        - key: "nublado.lsst.io/permitted"
+          operator: "Exists"
+          effect: "NoExecute"
       volumes:
         - name: "home"
           source:
@@ -88,6 +100,8 @@ controller:
           volumeName: "project"
         - containerPath: "/scratch"
           volumeName: "scratch"
+    metrics:
+      enabled: true
 
 jupyterhub:
   hub:
@@ -95,11 +109,7 @@ jupyterhub:
       url: "postgresql://nublado@cloud-sql-proxy.nublado/nublado"
       upgrade: true
 
-hub:
-  internalDatabase: false
 cloudsql:
   enabled: true
   instanceConnectionName: "science-platform-int-dc5d:us-central1:science-platform-int-8f439af2"
   serviceAccount: "nublado@science-platform-int-dc5d.iam.gserviceaccount.com"
-secrets:
-  templateSecrets: true

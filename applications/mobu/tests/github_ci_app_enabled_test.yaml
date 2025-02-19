@@ -15,7 +15,7 @@ set:
     host: "example.com"
 tests:
   - it: "Should create an anonymous ingress"
-    template: "ingress-github-ci-app.yaml"
+    template: "ingress-github-ci.yaml"
     asserts:
       - containsDocument:
           kind: "GafaelfawrIngress"
@@ -52,6 +52,7 @@ tests:
           path: "data['config.yaml']"
           value: |
             autostart: []
+            availableServices: []
             githubCiApp:
               acceptedGithubOrgs:
               - org1
@@ -64,6 +65,16 @@ tests:
               - bot-mobu-ci-user-2
             githubRefreshApp: null
             logLevel: INFO
+            metrics:
+              application: mobu
+              enabled: false
+              events:
+                topicPrefix: lsst.square.metrics.events
+              schemaManager:
+                registryUrl: http://sasquatch-schema-registry.sasquatch.svc.cluster.local:8081
+                suffix: ""
             pathPrefix: /mobu
             profile: production
+            sentryEnvironment: null
+            sentryTracesSampleConfig: 0
             slackAlerts: true

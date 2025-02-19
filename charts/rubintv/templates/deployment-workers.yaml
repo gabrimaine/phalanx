@@ -100,14 +100,17 @@ spec:
       initContainers:
       - name: "secret-perm-fixer"
         image: "busybox"
+        # TODO: Note that rubintv-secrets and butler-secrets share the same
+        # aws-credentials.ini and postgres-credentials.txt files so this will
+        # need to be fixed. See DM-47762.
         command:
         - "/bin/sh"
         - "-c"
         - |
-          cp /secrets/* /etc/secrets && \
 {{- if (not .Values.separateSecrets) }}
           cp /secrets-butler/* /etc/secrets && \
 {{- end }}
+          cp /secrets/* /etc/secrets && \
           chown {{ required "workers.uid must be set" .Values.workers.uid }}:{{ required "workers.gid must be set" .Values.workers.gid }} \
            /etc/secrets/* && \
           chmod 0600 /etc/secrets/*

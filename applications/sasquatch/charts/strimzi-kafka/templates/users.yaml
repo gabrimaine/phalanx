@@ -30,6 +30,13 @@ spec:
         host: "*"
         operation: All
       - resource:
+          type: topic
+          name: "lsst.s3"
+          patternType: prefix
+        type: allow
+        host: "*"
+        operation: All
+      - resource:
           type: cluster
         operations:
           - Describe
@@ -263,6 +270,13 @@ spec:
       - resource:
           type: topic
           name: "test.next-visit"
+          patternType: literal
+        type: allow
+        host: "*"
+        operation: Read
+      - resource:
+          type: topic
+          name: "test.next-visit-job"
           patternType: literal
         type: allow
         host: "*"
