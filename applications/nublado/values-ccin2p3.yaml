@@ -35,6 +35,8 @@ controller:
               volumeName: "throng"
             - containerPath: "/sps"
               volumeName: "sps"
+            - containerPath: "/data/rsp/home"
+              volumeName: "data"
       secrets:
         - secretName: "nublado-lab-secret"
           secretKey: "postgres-credentials.txt"
@@ -61,6 +63,10 @@ controller:
           source:
             type: "hostPath"
             path: "/sps"
+        - name: "data"
+          source:
+            type: "hostPath"
+            path: "/data/rsp/home"
       volumeMounts:
         - containerPath: "/pbs/home"
           volumeName: "home"
@@ -68,6 +74,8 @@ controller:
           volumeName: "throng"
         - containerPath: "/sps"
           volumeName: "sps"
+        - containerPath: "/data"
+          volumeName: "data"
 jupyterhub:
   prePuller:
     continuous:
