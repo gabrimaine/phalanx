@@ -14,7 +14,7 @@ prompt-proto-service:
   image:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 4.11.1
+    tag: 6.3.0
 
   instrument:
     pipelines:
@@ -74,7 +74,5 @@ prompt-proto-service:
     endpointUrl: https://usdf-rsp-dev.slac.stanford.edu/sasquatch-rest-proxy
     namespace: lsst.prompt.prod
     auth_env: false
-
-  logLevel: timer.lsst.activator=DEBUG lsst.diaPipe=VERBOSE lsst.rbClassify=VERBOSE lsst.resources=DEBUG
 
   fullnameOverride: "prompt-proto-service-latiss"

@@ -1,5 +1,10 @@
 # Default values for mobu.
 
+# -- Number of mobu instances to start. Starting more than one should only be
+# used temporarily in specific circumstances. See [the Mobu
+# documentation](https://mobu.lsst.io/user-guide/multiple-replicas.html)
+replicaCount: 1
+
 image:
   # -- mobu image to use
   repository: "ghcr.io/lsst-sqre/mobu"
@@ -26,6 +31,10 @@ config:
   # -- Autostart specification. Must be a list of mobu flock specifications.
   # Each flock listed will be automatically started when mobu is started.
   autostart: []
+
+  # -- Timeout for Gafaelfawr token creation requests during flock startup
+  # @default -- Use the default timeout for the Safir connection pool
+  gafaelfawrTimeout: null
 
   # -- Configuration for the GitHub refresh app integration.
   # See [the Mobu documentation](https://mobu.lsst.io/operations/github_refresh_app.html#add-phalanx-configuration)
@@ -86,7 +95,11 @@ config:
 resources:
   limits:
     cpu: "1"
-    memory: "3.5Gi"
+    # This is specified in Mi instead of Gi because ArgoCD will always show
+    # OutOfSync because of a bug in value normalization for certain
+    # combinations of attributes in certain resources:
+    # https://github.com/argoproj/argo-cd/issues/16400
+    memory: "3584Mi"
   requests:
     cpu: "50m"
     memory: "1Gi"
