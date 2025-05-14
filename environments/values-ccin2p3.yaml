@@ -11,3 +11,4 @@ applications:
   squareone: true
   tap: true
   mobu: false
+  strimzi: true
