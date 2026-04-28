@@ -34,6 +34,8 @@ nitpick_ignore = [
     ["py:obj", "pydantic.BaseModel.model_dict"],
     # See https://github.com/sphinx-doc/sphinx/issues/13178
     ["py:class", "pathlib._local.Path"],
+    # Bug in Sphinx with Python 3.14
+    ["py:data", "typing.Union"],
 ]
 nitpick_ignore_regex = [
     # Bug in Sphinx
@@ -65,9 +67,12 @@ ignore = [
     "^https://roundtable-dev.lsst.cloud",
     "^https://roundtable.lsst.cloud",
     "^https://rsp.lsst.ac.uk",
+    "^https://rsp-test.lsst.ac.uk",
     "^https://summit-lsp.lsst.codes",
     "^https://tacc-spherex.lsst.cloud",
+    "^https://tacc-spherex-dev.lsst.cloud",
     "^https://tucson-teststand.lsst.codes",
+    "^https://usdf-alert.slac.stanford.edu",
     "^https://usdf-alert-stream-broker-dev.slac.stanford.edu",
     "^https://usdf-cm-dev.slac.stanford.edu",
     "^https://usdf-cm.slac.stanford.edu",
@@ -85,4 +90,6 @@ ignore = [
     "^https://rubinobs.atlassian.net/",
     "^https://github.com/orgs/",
     "^https://console.cloud.google.com/",
+    # StackOverflow doesn't seem to like link checkers.
+    "^https://stackoverflow.com/questions/",
 ]

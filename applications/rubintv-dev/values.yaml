@@ -68,7 +68,7 @@ rubintv:
     # -- Settings for OCI image for worker pods
     image:
       # -- The Docker registry name for the container image.
-      repository: ts-dockerhub.lsst.org/rubintv-broadcaster
+      repository: ghcr.io/lsst-so/rubintv_production
 
       # -- The tag of the container image to use.
       tag: develop
@@ -140,7 +140,7 @@ redis:
   config:
     # -- Name of secret containing Redis password (may require changing if
     # fullnameOverride is set)
-    secretName: "rubintv-dev-secrets"
+    secretName: "rubintv-secrets"
 
     # -- Key inside secret from which to get the Redis password (do not
     # change)

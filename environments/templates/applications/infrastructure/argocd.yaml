@@ -13,7 +13,7 @@ spec:
   source:
     path: "applications/argocd"
     repoURL: {{ .Values.repoUrl | quote }}
-    targetRevision: {{ .Values.targetRevision | quote }}
+    targetRevision: {{ or (index .Values "revisions" "argocd") .Values.targetRevision | quote }}
     helm:
       parameters:
         - name: "global.vaultSecretsPath"
@@ -21,3 +21,6 @@ spec:
       valueFiles:
         - "values.yaml"
         - "values-{{ .Values.name }}.yaml"
+  syncPolicy:
+    syncOptions:
+      - "ServerSideApply=true"

@@ -10,10 +10,10 @@ Deployment for the Environmental Awareness Systems CSCs
 | auxtel-ess201.enabled | bool | `false` | Enable the ESS:201 CSC |
 | auxtel-ess202-sim.enabled | bool | `false` | Enable the ESS:202 simulator CSC |
 | auxtel-ess202.enabled | bool | `false` | Enable the ESS:202 CSC |
-| auxtel-ess203-sim.enabled | bool | `false` | Enable the ESS:203 simulator CSC |
-| auxtel-ess203.enabled | bool | `false` | Enable the ESS:203 CSC |
 | auxtel-ess204-sim.enabled | bool | `false` | Enable the ESS:204 simulator CSC |
 | auxtel-ess204.enabled | bool | `false` | Enable the ESS:204 CSC |
+| auxtel-ess308-sim.enabled | bool | `false` | Enable the ESS:308 simulator CSC |
+| auxtel-ess308.enabled | bool | `false` | Enable the ESS:308 CSC |
 | calibhill-ess301-sim.enabled | bool | `false` | Enable the ESS:301 simulator CSC |
 | calibhill-ess301.enabled | bool | `false` | Enable the ESS:301 CSC |
 | camera-ess111-sim.enabled | bool | `false` | Enable the ESS:111 simulator CSC |
@@ -39,7 +39,6 @@ Deployment for the Environmental Awareness Systems CSCs
 | epm-generator-ess305.enabled | bool | `false` | Enable the ESS:305 CSC |
 | epm-generator-ess306-sim.enabled | bool | `false` | Enable the ESS:303 simulator CSC |
 | epm-generator-ess306.enabled | bool | `false` | Enable the ESS:306 CSC |
-| global.baseUrl | string | Set by Argo CD | Base URL for the environment |
 | global.controlSystem.appNamespace | string | Set by ArgoCD | Application namespace for the control system deployment |
 | global.controlSystem.imageTag | string | Set by ArgoCD | Image tag for the control system deployment |
 | global.controlSystem.kafkaBrokerAddress | string | Set by ArgoCD | Kafka broker address for the control system deployment |
@@ -51,24 +50,46 @@ Deployment for the Environmental Awareness Systems CSCs
 | global.host | string | Set by Argo CD | Host name for ingress |
 | global.vaultSecretsPath | string | Set by Argo CD | Base path for Vault secrets |
 | hvac.enabled | bool | `false` | Enable the HVAC CSC |
+| louver-h1-ess441-sim.enabled | bool | `false` | Enable the ESS:441 simulator CSC |
+| louver-h1-ess441.enabled | bool | `false` | Enable the ESS:441 CSC |
+| louver-h1h2-ess442-sim.enabled | bool | `false` | Enable the ESS:442 simulator CSC |
+| louver-h1h2-ess442.enabled | bool | `false` | Enable the ESS:442 CSC |
+| louver-h2-ess443-sim.enabled | bool | `false` | Enable the ESS:443 simulator CSC |
+| louver-h2-ess443.enabled | bool | `false` | Enable the ESS:443 CSC |
 | m1m3-ess113-sim.enabled | bool | `false` | Enable the ESS:113 simulator CSC |
 | m1m3-ess113.enabled | bool | `false` | Enable the ESS:113 CSC |
+| m1m3-ess114-sim.enabled | bool | `false` | Enable the ESS:114 simulator CSC |
+| m1m3-ess114.enabled | bool | `false` | Enable the ESS:114 CSC |
+| m1m3-ess115-sim.enabled | bool | `false` | Enable the ESS:115 simulator CSC |
+| m1m3-ess115.enabled | bool | `false` | Enable the ESS:115 CSC |
+| m1m3-ess116-sim.enabled | bool | `false` | Enable the ESS:116 simulator CSC |
+| m1m3-ess116.enabled | bool | `false` | Enable the ESS:116 CSC |
+| m1m3-ess117-sim.enabled | bool | `false` | Enable the ESS:117 simulator CSC |
+| m1m3-ess117.enabled | bool | `false` | Enable the ESS:117 CSC |
 | m2-ess106-sim.enabled | bool | `false` | Enable the ESS:106 simulator CSC |
 | m2-ess106.enabled | bool | `false` | Enable the ESS:106 CSC |
 | m2-ess112-sim.enabled | bool | `false` | Enable the ESS:112 simulator CSC |
 | m2-ess112.enabled | bool | `false` | Enable the ESS:112 CSC |
-| mtdome-ess107-sim.enabled | bool | `false` | Enable the ESS:107 simulator CSC |
-| mtdome-ess107.enabled | bool | `false` | Enable the ESS:107 CSC |
-| mtdome-ess108-sim.enabled | bool | `false` | Enable the ESS:108 simulator CSC |
-| mtdome-ess108.enabled | bool | `false` | Enable the ESS:108 CSC |
+| mtdome-ess404-sim.enabled | bool | `false` | Enable the ESS:404 simulator CSC |
+| mtdome-ess404.enabled | bool | `false` | Enable the ESS:404 CSC |
+| mtdome-ess405-sim.enabled | bool | `false` | Enable the ESS:405 simulator CSC |
+| mtdome-ess405.enabled | bool | `false` | Enable the ESS:405 CSC |
+| partsens-ess127-sim.enabled | bool | `false` | Enable the ESS:127 simulator CSC |
+| partsens-ess127.enabled | bool | `false` | Enable the ESS:127 CSC |
+| partsens-ess128-sim.enabled | bool | `false` | Enable the ESS:128 simulator CSC |
+| partsens-ess128.enabled | bool | `false` | Enable the ESS:128 CSC |
+| partsens-ess129-sim.enabled | bool | `false` | Enable the ESS:129 simulator CSC |
+| partsens-ess129.enabled | bool | `false` | Enable the ESS:129 CSC |
 | ringss-ess304-sim.enabled | bool | `false` | Enable the ESS:304 simulator CSC |
 | ringss-ess304.enabled | bool | `false` | Enable the ESS:304 CSC |
-| tma-ess001-sim.enabled | bool | `false` | Enable the ESS:1 simulator CSC |
-| tma-ess001.enabled | bool | `false` | Enable the ESS:1 CSC |
 | tma-ess104-sim.enabled | bool | `false` | Enable the ESS:104 simulator CSC |
 | tma-ess104.enabled | bool | `false` | Enable the ESS:104 CSC |
 | tma-ess105-sim.enabled | bool | `false` | Enable the ESS:105 simulator CSC |
 | tma-ess105.enabled | bool | `false` | Enable the ESS:105 CSC |
 | tma-ess110-sim.enabled | bool | `false` | Enable the ESS:110 simulator CSC |
 | tma-ess110.enabled | bool | `false` | Enable the ESS:110 CSC |
+| tma-ess121-sim.enabled | bool | `false` | Enable the ESS:121 simulator CSC |
+| tma-ess121.enabled | bool | `false` | Enable the ESS:121 CSC |
+| tma-ess122-sim.enabled | bool | `false` | Enable the ESS:122 simulator CSC |
+| tma-ess122.enabled | bool | `false` | Enable the ESS:122 CSC |
 | weatherforecast.enabled | bool | `false` | Enable the WeatherForecast CSC |

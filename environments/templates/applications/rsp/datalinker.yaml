@@ -3,6 +3,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: "datalinker"
+  {{- if .Values.defaultComputeClass }}
+  labels:
+    cloud.google.com/default-compute-class: {{ .Values.defaultComputeClass }}
+  {{- end}}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -19,15 +23,17 @@ spec:
   source:
     path: "applications/datalinker"
     repoURL: {{ .Values.repoUrl | quote }}
-    targetRevision: {{ .Values.targetRevision | quote }}
+    targetRevision: {{ or (index .Values "revisions" "datalinker") .Values.targetRevision | quote }}
     helm:
       parameters:
-        - name: "global.baseUrl"
-          value: "https://{{ .Values.fqdn }}"
         - name: "global.butlerServerRepositories"
           value: {{ .Values.butlerServerRepositories | toJson | b64enc }}
+        - name: "global.environmentName"
+          value: {{ .Values.name | quote }}
         - name: "global.host"
           value: {{ .Values.fqdn | quote }}
+        - name: "global.repertoireUrl"
+          value: "https://{{ .Values.fqdn }}/repertoire"
         - name: "global.vaultSecretsPath"
           value: {{ .Values.vaultPathPrefix | quote }}
       valueFiles:

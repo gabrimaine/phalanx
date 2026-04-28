@@ -140,6 +140,11 @@ dependencies:
   condition: mtm2hexapod-sim.enabled
   repository: file://../../charts/csc
 - name: csc
+  alias: mtm2-hwsim
+  version: 1.0.0
+  condition: mtm2-hwsim.enabled
+  repository: file://../../charts/csc
+- name: csc
   alias: mtmount
   version: 1.0.0
   condition: mtmount.enabled
@@ -174,7 +179,22 @@ dependencies:
   condition: mtrotator-sim.enabled
   repository: file://../../charts/csc
 - name: csc
+  alias: mtvms-camera-rotator-sim
+  version: 1.0.0
+  condition: mtvms-camera-rotator-sim.enabled
+  repository: file://../../charts/csc
+- name: csc
+  alias: mtvms-m2-sim
+  version: 1.0.0
+  condition: mtvms-m2-sim.enabled
+  repository: file://../../charts/csc
+- name: csc
   alias: mtvms-m1m3-sim
   version: 1.0.0
   condition: mtvms-m1m3-sim.enabled
+  repository: file://../../charts/csc
+- name: csc
+  alias: wfoods
+  version: 1.0.0
+  condition: wfoods.enabled
   repository: file://../../charts/csc

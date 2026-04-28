@@ -24,9 +24,9 @@ spec:
       restartPolicy: Never
       containers:
       - name: sync-schema-job
-        image: {{ .Values.schemaSync.image.repository }}@{{ .Values.schemaSync.image.digest }}
+        image: "{{ .Values.schemaSync.image.repository }}:{{ .Values.schemaSync.image.tag }}"
         imagePullPolicy: "{{ .Values.schemaSync.image.pullPolicy}}"
         command:
-          - "syncAllSchemasToRegistry.py"
+          - "syncAllSchemasToRegistry"
           - "--schema-registry-url=http://{{ .Values.name }}:{{ .Values.port }}"
           - "--subject={{ .Values.schemaSync.subject }}"

@@ -14,12 +14,12 @@ auxtel-ess202-sim:
   # -- Enable the ESS:202 simulator CSC
   enabled: false
 
-auxtel-ess203:
-  # -- Enable the ESS:203 CSC
+auxtel-ess308:
+  # -- Enable the ESS:308 CSC
   enabled: false
 
-auxtel-ess203-sim:
-  # -- Enable the ESS:203 simulator CSC
+auxtel-ess308-sim:
+  # -- Enable the ESS:308 simulator CSC
   enabled: false
 
 auxtel-ess204:
@@ -134,12 +134,68 @@ hvac:
   # -- Enable the HVAC CSC
   enabled: false
 
+louver-h1-ess441:
+  # -- Enable the ESS:441 CSC
+  enabled: false
+
+louver-h1-ess441-sim:
+  # -- Enable the ESS:441 simulator CSC
+  enabled: false
+
+louver-h1h2-ess442:
+  # -- Enable the ESS:442 CSC
+  enabled: false
+
+louver-h1h2-ess442-sim:
+  # -- Enable the ESS:442 simulator CSC
+  enabled: false
+
+louver-h2-ess443:
+  # -- Enable the ESS:443 CSC
+  enabled: false
+
+louver-h2-ess443-sim:
+  # -- Enable the ESS:443 simulator CSC
+  enabled: false
+
 m1m3-ess113:
   # -- Enable the ESS:113 CSC
   enabled: false
 
 m1m3-ess113-sim:
   # -- Enable the ESS:113 simulator CSC
+  enabled: false
+
+m1m3-ess114:
+  # -- Enable the ESS:114 CSC
+  enabled: false
+
+m1m3-ess114-sim:
+  # -- Enable the ESS:114 simulator CSC
+  enabled: false
+
+m1m3-ess115:
+  # -- Enable the ESS:115 CSC
+  enabled: false
+
+m1m3-ess115-sim:
+  # -- Enable the ESS:115 simulator CSC
+  enabled: false
+
+m1m3-ess116:
+  # -- Enable the ESS:116 CSC
+  enabled: false
+
+m1m3-ess116-sim:
+  # -- Enable the ESS:116 simulator CSC
+  enabled: false
+
+m1m3-ess117:
+  # -- Enable the ESS:117 CSC
+  enabled: false
+
+m1m3-ess117-sim:
+  # -- Enable the ESS:117 simulator CSC
   enabled: false
 
 m2-ess106:
@@ -158,20 +214,44 @@ m2-ess112-sim:
   # -- Enable the ESS:112 simulator CSC
   enabled: false
 
-mtdome-ess107:
-  # -- Enable the ESS:107 CSC
+mtdome-ess404:
+  # -- Enable the ESS:404 CSC
   enabled: false
 
-mtdome-ess107-sim:
-  # -- Enable the ESS:107 simulator CSC
+mtdome-ess404-sim:
+  # -- Enable the ESS:404 simulator CSC
   enabled: false
 
-mtdome-ess108:
-  # -- Enable the ESS:108 CSC
+mtdome-ess405:
+  # -- Enable the ESS:405 CSC
   enabled: false
 
-mtdome-ess108-sim:
-  # -- Enable the ESS:108 simulator CSC
+mtdome-ess405-sim:
+  # -- Enable the ESS:405 simulator CSC
+  enabled: false
+
+partsens-ess127:
+  # -- Enable the ESS:127 CSC
+  enabled: false
+
+partsens-ess127-sim:
+  # -- Enable the ESS:127 simulator CSC
+  enabled: false
+
+partsens-ess128:
+  # -- Enable the ESS:128 CSC
+  enabled: false
+
+partsens-ess128-sim:
+  # -- Enable the ESS:128 simulator CSC
+  enabled: false
+
+partsens-ess129:
+  # -- Enable the ESS:129 CSC
+  enabled: false
+
+partsens-ess129-sim:
+  # -- Enable the ESS:129 simulator CSC
   enabled: false
 
 ringss-ess304:
@@ -182,12 +262,20 @@ ringss-ess304-sim:
   # -- Enable the ESS:304 simulator CSC
   enabled: false
 
-tma-ess001:
-  # -- Enable the ESS:1 CSC
+tma-ess121:
+  # -- Enable the ESS:121 CSC
   enabled: false
 
-tma-ess001-sim:
-  # -- Enable the ESS:1 simulator CSC
+tma-ess121-sim:
+  # -- Enable the ESS:121 simulator CSC
+  enabled: false
+
+tma-ess122:
+  # -- Enable the ESS:122 CSC
+  enabled: false
+
+tma-ess122-sim:
+  # -- Enable the ESS:122 simulator CSC
   enabled: false
 
 tma-ess104:
@@ -221,10 +309,6 @@ weatherforecast:
 # The following will be set by parameters injected by Argo CD and should not
 # be set in the individual environment values files.
 global:
-  # -- Base URL for the environment
-  # @default -- Set by Argo CD
-  baseUrl: ""
-
   # -- Host name for ingress
   # @default -- Set by Argo CD
   host: ""

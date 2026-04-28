@@ -1,0 +1,9 @@
+config:
+  availableDatasets:
+    - "dp02"
+    - "dp03"
+    - "dp1"
+    - "efd"
+    - "live"
+  hips:
+    datasets: {}

@@ -9,6 +9,9 @@ config:
   allowSubdomains: true
   slackAlerts: true
 
+  sentry:
+    enabled: true
+
   cilogon:
     clientId: "cilogon:/client_id/6b3f86ecfe74f14afa81b73a76be0868"
     enrollmentUrl: "https://id-int.lsst.cloud/registry/co_petitions/start/coef:10"
@@ -41,6 +44,8 @@ config:
   # User quota settings for services.
   quota:
     default:
+      api:
+        hips: 1000
       notebook:
         cpu: 8.0
         memory: 32
@@ -48,6 +53,8 @@ config:
   # Allow access by GitHub team.
   groupMapping:
     "admin:jupyterlab":
+      - "g_admins"
+    "admin:userinfo":
       - "g_admins"
     "exec:admin":
       - "g_admins"
@@ -57,6 +64,9 @@ config:
       - "g_users"
     "exec:portal":
       - "g_users"
+    "exec:portal-admin":
+      - "g_admins"
+      - "g_developers"
     "read:image":
       - "g_users"
     "read:tap":

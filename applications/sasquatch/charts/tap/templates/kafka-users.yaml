@@ -7,12 +7,7 @@ metadata:
     strimzi.io/cluster: {{ .Values.cluster.name }}
 spec:
   authentication:
-    type: scram-sha-512
-    password:
-      valueFrom:
-        secretKeyRef:
-          name: sasquatch
-          key: tap-password
+    type: tls
   authorization:
     type: simple
     acls:
@@ -57,3 +52,19 @@ spec:
         host: "*"
         operations:
           - All
+      - host: '*'
+        operations:
+          - "Read"
+        resource:
+          name: "app-metrics-events"
+          patternType: "prefix"
+          type: "group"
+      - host: '*'
+        operations:
+          - "Describe"
+          - "Read"
+          - "Write"
+        resource:
+          name: "lsst.square.metrics.events.qservkafka"
+          patternType: "literal"
+          type: "topic"

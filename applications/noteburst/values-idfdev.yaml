@@ -1,3 +1,6 @@
+image:
+  pullPolicy: Always
+
 config:
   logLevel: "DEBUG"
   metrics:
@@ -7,6 +10,7 @@ config:
     tracesSampleRate: 1
   worker:
     workerCount: 1
+    imageSelector: "weekly"
     identities:
       - username: "bot-noteburst90000"
       - username: "bot-noteburst90001"

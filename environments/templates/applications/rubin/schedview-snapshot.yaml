@@ -3,6 +3,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: "schedview-snapshot"
+  {{- if .Values.defaultComputeClass }}
+  labels:
+    cloud.google.com/default-compute-class: {{ .Values.defaultComputeClass }}
+  {{- end}}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -19,7 +23,7 @@ spec:
   source:
     path: "applications/schedview-snapshot"
     repoURL: {{ .Values.repoUrl | quote }}
-    targetRevision: {{ .Values.targetRevision | quote }}
+    targetRevision: {{ or (index .Values "revisions" "schedview-snapshot") .Values.targetRevision | quote }}
     helm:
       parameters:
         - name: "global.host"

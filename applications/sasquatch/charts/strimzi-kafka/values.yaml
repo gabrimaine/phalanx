@@ -11,21 +11,25 @@ cluster:
 
 kafka:
   # -- Version of Kafka to deploy
-  version: "3.8.0"
+  version: "4.1.0"
 
-  # -- Number of Kafka broker replicas to run
-  replicas: 3
+  # -- 09:00–11:00 CLT (UTC−3)
+  maintenanceTimeWindows: "0 0 12-13 ? * *"
+
+  # -- The KRaft metadata version used by the Kafka cluster.
+  # If the property is not set, it defaults to the metadata version that corresponds to the version property.
+  metadataVersion: null
+
+  # -- Topic Replication Factor.  The number of copies of topic data that are maintained.
+  replicationFactor: 3
 
   # -- The minimum number of in-sync replicas that must be available for the producer to successfully send records
   # Cannot be greater than the number of replicas.
   minInsyncReplicas: 2
 
-  storage:
-    # -- Size of the backing storage disk for each of the Kafka brokers
-    size: 500Gi
-
-    # -- Name of a StorageClass to use when requesting persistent volumes
-    storageClassName: ""
+  # -- If Strimzi reconciliation of this resource should be paused:
+  # https://strimzi.io/docs/operators/latest/full/deploying#proc-pausing-reconciliation-str
+  pauseReconciliation: false
 
   config:
     # -- Number of minutes for a consumer group's offsets to be retained
@@ -45,6 +49,9 @@ kafka:
   metricsConfig:
     # -- Whether metric configuration is enabled
     enabled: false
+
+    # -- Include per topic metrics in Jmx Exporter
+    includeTopicMetrics: false
 
   listeners:
     plain:
@@ -95,6 +102,10 @@ kafka:
       # resource
       annotations: {}
 
+      # -- Whether to allocate NodePort automatically for the Service with type LoadBalancer.
+      # @default -- true
+      allocateLoadBalancerNodePorts: true
+
     # -- Brokers configuration. _host_ is used in the brokers'
     # advertised.brokers configuration and for TLS hostname verification.  The
     # format is a list of maps.
@@ -112,8 +123,32 @@ kafka:
     #     annotations:
     #       metallb.universe.tf/address-pool: sdf-dmz
 
-  # -- Affinity for Kafka pod assignment
-  # @default -- See `values.yaml`
+# -- Allow specification of JVM options for both controllers and brokers
+jvmOptions: {}
+
+controller:
+  # -- Enable node pool for the kafka controllers
+  enabled: false
+
+  # -- Number of kafka controllers to run
+  replicas: 3
+
+  # -- IDs to assign to the controllers
+  nodeIds: "[3,4,5]"
+
+  storage:
+    # -- Storage size for the controllers
+    size: 20Gi
+
+    # -- Storage class to use when requesting persistent volumes
+    # @default -- None, use the default storage class
+    storageClassName: ""
+
+  # -- Whether to label the controller PVCs for backup by k8up,
+  # enabled on the summit and base environments
+  backup: false
+
+  # -- Affinity for controller pod assignment
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -125,43 +160,126 @@ kafka:
                   - kafka
           topologyKey: "kubernetes.io/hostname"
 
-  # -- Tolerations for Kafka broker pod assignment
+  # -- Tolerations for controller pod assignment
   tolerations: []
 
-  # -- Kubernetes requests and limits for the Kafka brokers
-  # @default -- See `values.yaml`
+  terminationGracePeriodSeconds: 180
+
+  # -- Kubernetes resources for the controllers
   resources:
     requests:
-      memory: 32Gi
-      cpu: "4"
+      memory: 2Gi
+      cpu: 500m
     limits:
-      memory: 64Gi
-      cpu: "8"
+      memory: 4Gi
+      cpu: "1"
 
-kraft:
-  # -- Enable KRaft mode for Kafka
+broker:
+  # -- Enable node pool for the kafka brokers
   enabled: false
 
-kafkaController:
-  # -- Enable Kafka Controller
-  enabled: false
+  # -- Node pool name
+  name: kafka
+
+  # -- Number of Kafka broker replicas to run
+  replicas: 3
+
+  # -- IDs to assign to the brokers
+  nodeIds: "[0,1,2]"
 
   storage:
-    # -- Size of the backing storage disk for each of the Kafka controllers
-    size: 20Gi
+    # -- Storage size for the brokers
+    size: 1.5Ti
 
-    # -- Name of a StorageClass to use when requesting persistent volumes
+    # -- Storage class to use when requesting persistent volumes
+    # @default -- None, use the default storage class
     storageClassName: ""
 
-  # -- Kubernetes requests and limits for the Kafka Controller
-  # @default -- See `values.yaml`
+  # -- Whether to label the broker PVCs for backup by k8up,
+  # enabled on the summit and base environments
+  backup: false
+
+  # -- Affinity for broker pod assignment
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/name"
+                operator: In
+                values:
+                  - kafka
+          topologyKey: "kubernetes.io/hostname"
+
+  # -- Tolerations for broker pod assignment
+  tolerations: []
+
+  terminationGracePeriodSeconds: 180
+
+  # -- Kubernetes resources for the brokers
   resources:
     requests:
-      memory: 32Gi
-      cpu: "4"
+      memory: 4Gi
+      cpu: 1
     limits:
-      memory: 64Gi
-      cpu: "8"
+      memory: 8Gi
+      cpu: 2
+
+cruiseControl:
+  # -- Enable cruise control (required for broker migration and rebalancing)
+  enabled: false
+
+  # -- Maximum number of replicas per broker
+  maxReplicasPerBroker: 20000
+
+  metricsConfig:
+    # -- Enable metrics generation
+    enabled: false
+
+brokerMigration:
+  # -- Whether to enable another node pool to migrate the kafka brokers to
+  enabled: false
+
+  # -- Name of the node pool
+  name: broker-migration
+
+  # -- IDs to assign to the brokers
+  nodeIDs: "[6,7,8]"
+
+  # -- Storage size for the brokers
+  size: 1.5Ti
+
+  # -- Storage class name for the brokers
+  # @default -- None, use the default storage class
+  storageClassName: ""
+
+  rebalance:
+    # -- Whether to rebalance the kafka cluster
+    enabled: false
+
+    # -- Brokers to avoid during rebalancing
+    # These are the brokers you are migrating from and you want to remove
+    # after the migration is complete.
+    avoidBrokers:
+      - 0
+      - 1
+      - 2
+
+  # -- Affinity for Kafka broker pod assignment
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/name"
+                operator: In
+                values:
+                  - kafka
+          topologyKey: "kubernetes.io/hostname"
+
+
+  # -- Tolerations for Kafka broker pod assignment
+  tolerations: []
 
 kafkaExporter:
   # -- Enable Kafka exporter
@@ -179,16 +297,25 @@ kafkaExporter:
   # -- Enable Sarama logging for pod
   enableSaramaLogging: false
 
+  # -- Whether to show all offsets or just offsets from connected groups
+  showAllOffsets: true
+
   # -- Kubernetes requests and limits for the Kafka exporter
   # @default -- See `values.yaml`
-  resources: {}
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 1
+    limits:
+      memory: 1Gi
+      cpu: 2
 
 connect:
   # -- Enable Kafka Connect
   enabled: false
 
   # -- Custom strimzi-kafka image with connector plugins used by sasquatch
-  image: ghcr.io/lsst-sqre/strimzi-0.40.0-kafka-3.7.0:tickets-DM-43491
+  image: ghcr.io/lsst-sqre/strimzi-0.47.0-kafka-4.0.0:tickets-DM-43491
 
   # -- Number of Kafka Connect replicas to run
   replicas: 3
@@ -212,6 +339,16 @@ connect:
     # -- URL for the schema registry
     value.converter.schema.registry.url: http://sasquatch-schema-registry.sasquatch:8081
 
+  # -- Kubernetes requests and limits for Kafka Connect
+  # @default -- See `values.yaml`
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 1
+    limits:
+      memory: 4Gi
+      cpu: 2
+
 registry:
   ingress:
     # -- Whether to enable an ingress for the Schema Registry
@@ -231,11 +368,11 @@ registry:
   # @default -- See `values.yaml`
   resources:
     requests:
-      memory: "128Mi"
-      cpu: "5m"
+      memory: 1Gi
+      cpu: 100m
     limits:
-      memory: "2Gi"
-      cpu: "1"
+      memory: 2Gi
+      cpu: 1
 
 
 # -- A list of usernames for users who should have global admin permissions.
@@ -254,14 +391,19 @@ users:
     enabled: false
 
 mirrormaker2:
-  # -- Enable replication in the target (passive) cluster
+  # -- Enable replication from the source cluster
   enabled: false
 
   # -- Number of Mirror Maker replicas to run
   replicas: 3
 
   source:
-    # -- Source (active) cluster to replicate from
+    # -- Source cluster alias. Used to identify the source cluster in
+    # MirrorMaker2 configuration. The alias is also added as a prefix to
+    # the replicated topics when the DefaultReplicationPolicy replication policy is used.
+    # @default -- None, must be set if enabled
+    alias: ""
+    # -- Source cluster bootstrap server address
     # @default -- None, must be set if enabled
     bootstrapServer: ""
 
@@ -269,29 +411,35 @@ mirrormaker2:
     # comma-separated list or regular expression pattern
     topicsPattern: "registry-schemas, lsst.sal.*"
 
+  target:
+    # -- Target cluster alias. Used to identify the target cluster in
+    # MirrorMaker2 configuration.
+    # @default -- target
+    alias: "target"
+
   replication:
     policy:
-      # -- Convention used to rename topics when the DefaultReplicationPolicy
-      # replication policy is used. Default is "" when the
-      # IdentityReplicationPolicy replication policy is used.
+      # -- Convention used for the replicated topic name when the DefaultReplicationPolicy
+      # replication policy is used.
+      # @default -- No separator, topic names are preserved when IdentityReplicationPolicy is used.
       separator: ""
 
       # -- Replication policy.
+      # @default -- org.apache.kafka.connect.mirror.IdentityReplicationPolicy
       class: "org.apache.kafka.connect.mirror.IdentityReplicationPolicy"
+    # -- Offset reset policy for the Mirror Maker consumer.
+    # Options are 'earliest' and 'latest'.
+    # @default -- earliest
+    offset: earliest
+    # -- The location (source/target) of the offset-syncs topic.
+    # @default -- source
+    offsetSyncsTopicLocation: source
 
-# -- Configuration for the Kafka Cruise Control
-cruiseControl:
-  enabled: false
-
-# -- Configuration for deploying Kafka brokers with local storage
-brokerStorage:
-  enabled: false
-  migration:
-    enabled: false
-    rebalance: false
-    brokers:
-      - 0
-      - 1
-      - 2
-  size: 1.5Ti
-  storageClassName: localdrive
+  # -- Kubernetes resources for MirrorMaker2
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 500m
+    limits:
+      memory: 4Gi
+      cpu: 1

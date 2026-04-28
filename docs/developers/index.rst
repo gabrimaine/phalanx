@@ -37,12 +37,14 @@ Individual applications are documented in the :doc:`/applications/index` section
    :caption: Deploy & maintain
    :name: dev-deploy-toc
 
+   github-codeowners
    get-application-logs
    upgrade
    update-a-secret
    deploy-from-a-branch
    switch-environment-to-branch
    resource-limits
+   add-repertoire
 
 .. toctree::
    :maxdepth: 2

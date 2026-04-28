@@ -15,7 +15,7 @@ Real-time display front end development application
 | global.vaultSecretsPath | string | Set by Argo CD | Base path for Vault secrets |
 | redis.affinity | object | `{}` | Affinity rules for the Redis pod |
 | redis.config.secretKey | string | `"redis-password"` | Key inside secret from which to get the Redis password (do not change) |
-| redis.config.secretName | string | `"rubintv-dev-secrets"` | Name of secret containing Redis password (may require changing if fullnameOverride is set) |
+| redis.config.secretName | string | `"rubintv-secrets"` | Name of secret containing Redis password (may require changing if fullnameOverride is set) |
 | redis.nodeSelector | object | `{}` | Node selection rules for the Redis pod |
 | redis.persistence.accessMode | string | `"ReadWriteOnce"` | Access mode of storage to request |
 | redis.persistence.enabled | bool | `true` | Whether to persist Redis storage and thus tokens. Setting this to false will use `emptyDir` and reset all tokens on every restart. Only use this for a test deployment. |
@@ -46,9 +46,9 @@ Real-time display front end development application
 | rubintv.workers.env | list | `[]` | This section holds a list of key, value pairs for environmental variables (name: key, value: value). |
 | rubintv.workers.envSecrets | list | See `values.yaml` | This section holds specifications for secret injection. |
 | rubintv.workers.gid | string | `nil` | GID to run as (site-dependent as above) |
-| rubintv.workers.image | object | `{"pullPolicy":"IfNotPresent","repository":"ts-dockerhub.lsst.org/rubintv-broadcaster","tag":"develop"}` | Settings for OCI image for worker pods |
+| rubintv.workers.image | object | `{"pullPolicy":"IfNotPresent","repository":"ghcr.io/lsst-so/rubintv_production","tag":"develop"}` | Settings for OCI image for worker pods |
 | rubintv.workers.image.pullPolicy | string | `"IfNotPresent"` | The policy to apply when pulling an image for deployment. |
-| rubintv.workers.image.repository | string | `"ts-dockerhub.lsst.org/rubintv-broadcaster"` | The Docker registry name for the container image. |
+| rubintv.workers.image.repository | string | `"ghcr.io/lsst-so/rubintv_production"` | The Docker registry name for the container image. |
 | rubintv.workers.image.tag | string | `"develop"` | The tag of the container image to use. |
 | rubintv.workers.imagePullSecrets | list | See `values.yaml` | Image pull secrets. |
 | rubintv.workers.nodeSelector | object | `{}` | Node selector rules for the rubintv-dev worker pods |

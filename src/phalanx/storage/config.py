@@ -1,7 +1,5 @@
 """Parsing and analysis of Phalanx configuration."""
 
-from __future__ import annotations
-
 import re
 from collections import defaultdict
 from contextlib import suppress
@@ -300,7 +298,7 @@ class ConfigStorage:
         for dependency in chart.get("dependencies", []):
             if "repository" in dependency:
                 repository = dependency["repository"]
-                if not repository.startswith("file:"):
+                if not repository.startswith(("file:", "oci:")):
                     repo_urls.add(repository)
         return repo_urls
 
@@ -632,7 +630,7 @@ class ConfigStorage:
             The name of the environment to check for the revisions.
         """
         for app in self.list_project_applications("telescope"):
-            if app in ["argo-workflows", "obsenv-management", "ocps-uws-job"]:
+            if app in {"argo-workflows", "ocps-uws-job"}:
                 continue
             app_config = self._load_application_config(app)
             env_config = app_config.environment_values[environment]
@@ -643,7 +641,7 @@ class ConfigStorage:
                         item_config, app_list, key, environment
                     )
                     continue
-                if key in ["uws-api-server"]:
+                if key == "uws-api-server":
                     continue
                 if "image" not in item_config:
                     continue

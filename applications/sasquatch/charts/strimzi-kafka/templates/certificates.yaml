@@ -6,11 +6,16 @@ metadata:
 
 spec:
   secretName: {{ .Values.cluster.name }}-external-tls
+  {{- with .Values.cluster.privateKey }}
+  privateKey:
+    encoding: {{ .encoding | quote }}
+  {{- end }}
 
   issuerRef:
     name: {{ .Values.kafka.externalListener.tls.certIssuerName }}
     kind: ClusterIssuer
-
+  privateKey:
+    encoding: PKCS8
   dnsNames:
     - {{ .Values.kafka.externalListener.bootstrap.host }}
     {{- range $broker := .Values.kafka.externalListener.brokers }}

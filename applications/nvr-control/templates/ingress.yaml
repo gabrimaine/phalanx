@@ -5,7 +5,6 @@ metadata:
   labels:
     {{- include "nvr-control.labels" . | nindent 4 }}
 config:
-  baseUrl: {{ .Values.global.baseUrl }}
   loginRedirect: true
   scopes:
     all:
@@ -15,6 +14,7 @@ template:
   metadata:
     name: nvr-control
     annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-dns"
       nginx.ingress.kubernetes.io/configuration-snippet: |
         proxy_set_header X-Rubin-NVR-Proxied-User operator;
       {{- with .Values.ingress.annotations }}
@@ -22,13 +22,17 @@ template:
       {{- end }}
   spec:
     rules:
-      - host: {{ required "global.host must be set" .Values.global.host }}
+      - host: "nvr.{{ required "global.host must be set" .Values.global.host }}"
         http:
           paths:
-            - path: /nvr
+            - path: /
               pathType: Prefix
               backend:
                 service:
                   name: nvr-control
                   port:
                     name: http
+    tls:
+      - hosts:
+          - "nvr.{{ .Values.global.host }}"
+        secretName: "nvr-tls"

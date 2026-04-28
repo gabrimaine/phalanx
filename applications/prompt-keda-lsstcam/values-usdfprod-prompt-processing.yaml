@@ -1,18 +1,15 @@
 prompt-keda:
   image:
     pullPolicy: IfNotPresent
-    tag: 6.9.0
+    tag: 13.13.0
 
   alerts:
     username: kafka-admin
     server: usdf-alert-stream-dev.lsst.cloud:9094
-    topic: lsst-alerts-v7.4
+    topic: lsst-alerts-v10.0
 
   worker:
-    # TODO: need to adjust this once we know how leaky the LSSTCam pipeline is
-    # restart: 7
-    # Expect much less memory usage/leakage for Single-Frame only
-    restart: 30
+    restart: 10
 
   instrument:
     pipelines:
@@ -21,15 +18,31 @@ prompt-keda:
       # The config will get corrupted after template substitution.
       # Block-style mappings can have lines of any length.
       main: |-
-        - survey: BLOCK-365  # FBS SV Field Survey
-          pipelines:
-          # TODO: enable ApPipe only when we're ready (resources, alerts, etc.)
+        # Dense dithered star field calibrations
+        - survey: BLOCK-365
+          pipelines: &std-main-pipelines
+          - ${PROMPT_PROCESSING_DIR}/pipelines/LSSTCam/ApPipe.yaml
           - ${PROMPT_PROCESSING_DIR}/pipelines/LSSTCam/SingleFrame.yaml
           - ${PROMPT_PROCESSING_DIR}/pipelines/LSSTCam/Isr.yaml
-        - survey: BLOCK-T427  # Daytime checkout
+        # FBS Pre-Operations Survey
+        - {survey: BLOCK-407, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-408, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-416, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-417, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-419, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-421, pipelines: *std-main-pipelines}
+        # TMA checkout, no images
+        - {survey: BLOCK-T250, pipelines: []}
+        # Daytime checkout
+        - survey: BLOCK-T427
           pipelines: ['${PROMPT_PROCESSING_DIR}/pipelines/LSSTCam/Isr-cal.yaml']
-        # Produces nextVisits but not images
-        - {survey: "BLOCK-T454", pipelines: []}
+        # All-day clearing; produces nextVisits but not images
+        - {survey: BLOCK-T454, pipelines: []}
+        # Fixed telescope pointing stability test
+        - {survey: BLOCK-T698, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-T703, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-T704, pipelines: *std-main-pipelines}
+        - {survey: BLOCK-T706, pipelines: *std-main-pipelines}
         # Miscellaneous scripts, not always images
         - {survey: "", pipelines: []}
         # Ignore unknown events during Commissioning
@@ -37,33 +50,75 @@ prompt-keda:
       preprocessing: |-
         # Run to enable solar system processing in SingleFrame
         - survey: BLOCK-365
-          pipelines: ['${PROMPT_PROCESSING_DIR}/pipelines/LSSTCam/Preprocessing.yaml']
+          pipelines: &std-pre-pipelines
+          - ${PROMPT_PROCESSING_DIR}/pipelines/LSSTCam/Preprocessing.yaml
+        - {survey: BLOCK-407, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-408, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-416, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-417, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-419, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-421, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-T698, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-T703, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-T704, pipelines: *std-pre-pipelines}
+        - {survey: BLOCK-T706, pipelines: *std-pre-pipelines}
         - {survey: "", pipelines: []}
         # Don't preprocess anything unknown
         - {pipelines: []}
     preloadPadding: 50.1
-    calibRepo: s3://rubin-summit-users
+    centralRepo: s3://rubin-summit-users
+    readRepo: s3://rubin-summit-users/butler-readonly.yaml
+    localRepoConfig: s3://rubin-summit-users/config/prompt_processing.yaml
+    exportTypes: |-
+      - ".*_(config|metadata|log)"
+      - "packages"
+      - "regionTimeInfo"
+      - "template_detector"
+      - "preliminary_visit_image"
+      - "preliminary_visit_image_background"
+      - "difference_image"
+      - "single_visit_star_footprints"
+      - "dia_source_unfiltered"
+      - "dia_source_detector"
+      - "difference_kernel"
+      - "dia_source_apdb"
+      - "dia_forced_source_apdb"
+      - "dia_object_apdb"
+      - "ss_source_direct_detector"
+      - "ss_object_direct_unassociated"
+      - "ss_object_unassociated_detector"
+      - "ss_source_detector"
+      - "marginal_new_dia_source"
+      - "new_dia_source"
+      - "preloaded_dia_forced_source"
+      - "preloaded_dia_object"
+      - "preloaded_dia_source"
+      - "preloaded_ss_object"
+      - "prompt_provenance"
 
   s3:
     imageBucket: rubin-summit
     endpointUrl: https://sdfembs3.sdf.slac.stanford.edu
+    aws_profile: embargo
 
   raw_microservice: http://172.24.5.158:8080/presence
 
-  # TODO: replace with permanent service once it's up
-  mpSky_service: http://sdfiana014.sdf.slac.stanford.edu:3666/ephemerides/
+  mpSky_service: http://usdf-mpsky.sdf.slac.stanford.edu/ephemerides/
+
+  iers_cache: s3://rubin-summit-users/iers-cache.zip
 
   imageNotifications:
-    kafkaClusterAddress: prompt-processing-2-kafka-bootstrap.kafka:9092
-    topic: rubin-summit-notification
-    # TODO: need to adjust this based on observed nextVisit lead time (depends on scheduler) and PP prep time
-    # The shorter this is, the less capacity is wasted on canceled visits
+    kafkaClusterAddress: s3-file-notifications-kafka-external-bootstrap.s3-file-notifications:9094
+    topic: rubin-summit-notification-8
     imageTimeout: 120
 
   apdb:
     config: s3://rubin-summit-users/apdb_config/cassandra/pp_apdb_lsstcam.yaml
 
-  logLevel: timer.lsst.activator=DEBUG timer.lsst.daf.butler=VERBOSE lsst.associateApdb=VERBOSE lsst.computeReliability=VERBOSE
+  logLevel: >-
+    timer.lsst.activator=DEBUG timer.lsst.daf.butler=VERBOSE
+    lsst.associateApdb=VERBOSE lsst.loadDiaCatalogs=VERBOSE lsst.computeReliability=VERBOSE
+    lsst.daf.butler=VERBOSE
 
   sasquatch:
     # TODO: production Sasquatch not yet ready
@@ -71,24 +126,23 @@ prompt-keda:
     namespace: lsst.prompt.prod
     auth_env: false
 
+  debug:
+    monitorDaxApdb: true
+
   keda:
     minReplicaCount: 3
-    # TODO: this is scaled for SingleFrame, with 25% margin
-    maxReplicaCount: 1100
-    # TODO: may need to override for debugging
-    # failedJobsHistoryLimit: 100
-
-    # TODO: may need to reduce if we don't have enough capacity
-    # redisStreams:
-    #   expiration: 600
+    maxReplicaCount: 1700
 
   initializer:
-    # 6 retries is not enough time to fix, e.g., DB permissions problems
-    retries: 15
-
     podAnnotations: {
       edu.stanford.slac.sdf.project/usdf-embargo: "true"
     }
+
+  butler_writer:
+    enabled: true
+    kafka_cluster: prompt-kafka-kafka-bootstrap.prompt-kafka:9092
+    kafka_username: butler-writer
+    kafka_topic: butler-writer
 
   podAnnotations: {
     edu.stanford.slac.sdf.project/usdf-embargo: "true"

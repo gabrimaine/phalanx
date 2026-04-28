@@ -1,8 +1,11 @@
 redis:
   persistence:
     storageClass: "rook-ceph-block"
+    k8up:
+      enabled: true
 
 config:
+  allowSubdomains: true
   slackAlerts: true
   databaseUrl: "postgresql://gafaelfawr@postgresdb01.cp.lsst.org/gafaelfawr"
 
@@ -28,12 +31,15 @@ config:
   oidcServer:
     enabled: true
 
-  # Allow access by GitHub team.
   groupMapping:
     "admin:jupyterlab":
+      - "k8s-yagan-admins"
+      - "sqre"
+    "admin:userinfo":
+      - "k8s-yagan-admins"
       - "sqre"
     "exec:admin":
-      - "k8s-yagan-admin"
+      - "k8s-yagan-admins"
       - "sqre"
     "exec:internal-tools":
       - "rsp-summit"
@@ -41,11 +47,17 @@ config:
       - "rsp-summit"
     "exec:portal":
       - "rsp-summit"
+    "exec:portal-admin":
+      - "k8s-yagan-admins"
+      - "sqre"
     "read:image":
+      - "rsp-summit"
+    "read:sasquatch":
       - "rsp-summit"
     "read:tap":
       - "rsp-summit"
     "write:sasquatch":
+      - "k8s-yagan-admins"
       - "sqre"
 
   initialAdmins:

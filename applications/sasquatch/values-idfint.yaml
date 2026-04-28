@@ -1,12 +1,18 @@
 strimzi-kafka:
   kafka:
+    listeners:
+      tls:
+        enabled: true
+      plain:
+        enabled: true
+      external:
+        enabled: true
     externalListener:
       tls:
         enabled: true
       bootstrap:
         loadBalancerIP: "35.188.187.82"
         host: sasquatch-int-kafka-bootstrap.lsst.cloud
-
       brokers:
         - broker: 0
           loadBalancerIP: "34.171.69.125"
@@ -17,53 +23,25 @@ strimzi-kafka:
         - broker: 2
           loadBalancerIP: "34.173.225.150"
           host: sasquatch-int-kafka-2.lsst.cloud
-  mirrormaker2:
-    enabled: true
-    source:
-      bootstrapServer: sasquatch-dev-kafka-bootstrap.lsst.cloud:9094
-      topicsPattern: "registry-schemas, lsst.sal.*, lsst.dm.*"
-    resources:
-      requests:
-        cpu: 2
-        memory: 4Gi
-      limits:
-        cpu: 4
-        memory: 8Gi
   users:
-    replicator:
-      enabled: true
     telegraf:
       enabled: true
-  kraft:
+  controller:
     enabled: true
-  kafkaController:
+  broker:
     enabled: true
-    resources:
-      requests:
-        memory: 16Gi
-        cpu: "2"
-      limits:
-        memory: 16Gi
-        cpu: "2"
-  registry:
-    ingress:
-      enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/rewrite-target: /$2
-      hostname: data-int.lsst.cloud
-      path: /schema-registry(/|$)(.*)
+    storage:
+      size: 500Gi
+
+schema-registry:
+  enabled: true
+  ingress:
+    enabled: true
 
 influxdb:
   ingress:
     enabled: false
     hostname: data-int.lsst.cloud
-  resources:
-    requests:
-      memory: 16Gi
-      cpu: 2
-    limits:
-      memory: 16Gi
-      cpu: 2
 
 customInfluxDBIngress:
   enabled: true
@@ -94,13 +72,11 @@ telegraf:
 kafdrop:
   ingress:
     enabled: true
-    hostname: data-int.lsst.cloud
 
 rest-proxy:
   enabled: true
   ingress:
     enabled: true
-    hostname: data-int.lsst.cloud
   kafka:
     topicPrefixes:
       - lsst.example
@@ -126,15 +102,20 @@ chronograf:
 app-metrics:
   enabled: true
   apps:
+    - bigquerykafka
     - gafaelfawr
+    - herald
     - mobu
     - noteburst
     - nublado
+    - qservkafka
+    - repertoire
     - sia
     - wobbly
 
 backup:
   enabled: true
+  schedule: "0 5 * * *"
   persistence:
     size: 500Gi
     storageClass: standard
@@ -153,4 +134,7 @@ backpack:
   enabled: true
 
 tap:
+  enabled: true
+
+ppdbtap:
   enabled: true

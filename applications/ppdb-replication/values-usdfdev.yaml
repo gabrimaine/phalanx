@@ -1,30 +1,16 @@
 config:
 
-  # -- Logging level
-  logLevel: "INFO"
-
   # -- Logging profile (`production` for JSON, `development` for
   # human-friendly)
   logProfile: "development"
 
   # -- APDB config file resource
-  apdbConfig: "label:pp-prod:lsstcomcamsim-or4"
+  apdbConfig: "s3://embargo@rubin-summit-users/apdb_config/cassandra/pp_apdb_lsstcam.yaml"
 
   # -- PPDB config file resource
-  ppdbConfig: "/sdf/group/rubin/user/jeremym/ppdb-replication/config/ppdb-replication-test-1.yaml"
+  ppdbConfig: /sdf/data/rubin/user/jeremym/dev/DM-50563/ppdb-config/ppdb_dm51379.yaml
 
-  # -- APDB index URI
-  apdbIndexUri: "/sdf/group/rubin/shared/apdb_config/apdb-index.yaml"
-
-  # -- S3 endpoint URL
-  s3EndpointUrl: https://s3dfrgw.slac.stanford.edu
-
-  # -- S3 profile name for additional S3 profile
-  additionalS3ProfileName: "embargo"
-
-  # -- S3 profile URL for additional S3 profile
-  additionalS3ProfileUrl: "https://sdfembs3.sdf.slac.stanford.edu"
-
+  # -- Volumes specific to the environment
   volumes:
     - name: sdf-group-rubin
       persistentVolumeClaim:
@@ -32,13 +18,22 @@ config:
     - name: sdf-data-rubin
       persistentVolumeClaim:
         claimName: sdf-data-rubin
+    - name: sdf-scratch
+      persistentVolumeClain:
+        claimName: sdf-scratch
+  # -- Volume mounts
   volumeMounts:
     - name: sdf-group-rubin
       mountPath: /sdf/group/rubin
     - name: sdf-data-rubin
       mountPath: /sdf/data/rubin
+    - name: sdf-scratch
+      mountPath: /sdf/scratch
+  # -- Persistent volume claims
   persistentVolumeClaims:
     - name: sdf-group-rubin
       storageClassName: sdf-group-rubin
     - name: sdf-data-rubin
       storageClassName: sdf-data-rubin
+    - name: sdf-scratch
+      storageClassName: sdf-scratch

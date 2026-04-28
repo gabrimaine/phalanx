@@ -1,7 +1,6 @@
 """Tests for the secrets command-line subcommand."""
 
-from __future__ import annotations
-
+import json
 import os
 import re
 from base64 import b64decode, b64encode
@@ -12,15 +11,14 @@ import bcrypt
 import click
 import yaml
 from cryptography.fernet import Fernet
+from syrupy.assertion import SnapshotAssertion
 
 from phalanx.factory import Factory
-from phalanx.models.gafaelfawr import Token
 
 from ..support.cli import run_cli
 from ..support.data import (
     phalanx_test_path,
     read_input_static_secrets,
-    read_output_data,
     read_output_json,
 )
 from ..support.onepassword import MockOnepasswordClient
@@ -46,7 +44,9 @@ def _get_app_secret(mock_vault: MockVaultClient, path: str) -> dict[str, str]:
     return result["data"]["data"]
 
 
-def test_audit(factory: Factory, mock_vault: MockVaultClient) -> None:
+def test_audit(
+    factory: Factory, mock_vault: MockVaultClient, snapshot: SnapshotAssertion
+) -> None:
     input_path = phalanx_test_path()
     config_storage = factory.create_config_storage()
     environment = config_storage.load_environment("idfdev")
@@ -62,10 +62,12 @@ def test_audit(factory: Factory, mock_vault: MockVaultClient) -> None:
         env={"VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 1
-    assert result.output == read_output_data("idfdev", "secrets-audit")
+    assert result.output == snapshot
 
 
-def test_audit_exclude(factory: Factory, mock_vault: MockVaultClient) -> None:
+def test_audit_exclude(
+    factory: Factory, mock_vault: MockVaultClient, snapshot: SnapshotAssertion
+) -> None:
     input_path = phalanx_test_path()
     config_storage = factory.create_config_storage()
     environment = config_storage.load_environment("idfdev")
@@ -85,17 +87,14 @@ def test_audit_exclude(factory: Factory, mock_vault: MockVaultClient) -> None:
         env={"VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 1
-    all_output = read_output_data("idfdev", "secrets-audit").split("\n")
-    expected = "\n".join(
-        o for o in all_output if "argocd" not in o and "unknown" not in o
-    )
-    assert result.output == expected
+    assert result.output == snapshot
 
 
 def test_audit_onepassword_missing(
     factory: Factory,
     mock_onepassword: MockOnepasswordClient,
     mock_vault: MockVaultClient,
+    snapshot: SnapshotAssertion,
 ) -> None:
     """Check reporting of missing 1Password secrets."""
     phalanx_test_path()
@@ -113,25 +112,23 @@ def test_audit_onepassword_missing(
         env={"OP_CONNECT_TOKEN": "sometoken", "VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 1
-    assert result.output == read_output_data(
-        "minikube", "audit-missing-output"
-    )
+    assert result.output == snapshot
 
 
-def test_list() -> None:
+def test_list(snapshot: SnapshotAssertion) -> None:
     result = run_cli("secrets", "list", "idfdev")
     assert result.exit_code == 0
-    assert result.output == read_output_data("idfdev", "secrets-list")
+    assert result.output == snapshot
 
 
-def test_list_path_search() -> None:
+def test_list_path_search(snapshot: SnapshotAssertion) -> None:
     """Test that we can find the root of the tree from a subdirectory."""
     cwd = Path.cwd()
     os.chdir(str(phalanx_test_path() / "applications" / "gafaelfawr"))
     try:
         result = run_cli("secrets", "list", "idfdev", needs_config=False)
         assert result.exit_code == 0
-        assert result.output == read_output_data("idfdev", "secrets-list")
+        assert result.output == snapshot
     finally:
         os.chdir(str(cwd))
 
@@ -152,6 +149,7 @@ def test_onepassword_secrets(
     factory: Factory,
     tmp_path: Path,
     mock_onepassword: MockOnepasswordClient,
+    snapshot: SnapshotAssertion,
 ) -> None:
     config_storage = factory.create_config_storage()
     environment = config_storage.load_environment("minikube")
@@ -172,7 +170,7 @@ def test_onepassword_secrets(
     assert result.output == ""
 
     output = output_path.read_text()
-    assert output == read_output_data("minikube", "onepassword-secrets.yaml")
+    assert output == snapshot
 
     result = run_cli(
         "secrets",
@@ -201,13 +199,15 @@ def test_schema() -> None:
     assert result.output == current.read_text()
 
 
-def test_static_template() -> None:
+def test_static_template(snapshot: SnapshotAssertion) -> None:
     result = run_cli("secrets", "static-template", "idfdev")
     assert result.exit_code == 0
-    assert result.output == read_output_data("idfdev", "static-secrets.yaml")
+    assert result.output == snapshot
 
 
-def test_sync(factory: Factory, mock_vault: MockVaultClient) -> None:
+def test_sync(
+    factory: Factory, mock_vault: MockVaultClient, snapshot: SnapshotAssertion
+) -> None:
     input_path = phalanx_test_path()
     secrets_path = input_path / "secrets" / "idfdev.yaml"
     config_storage = factory.create_config_storage()
@@ -233,7 +233,7 @@ def test_sync(factory: Factory, mock_vault: MockVaultClient) -> None:
         env={"VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 0
-    assert result.output == read_output_data("idfdev", "sync-output")
+    assert result.output == snapshot
 
     # Check that all static secrets were copied over correctly.
     static_secrets = read_input_static_secrets("idfdev")
@@ -270,7 +270,7 @@ def test_sync(factory: Factory, mock_vault: MockVaultClient) -> None:
         env={"VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 0
-    assert result.output == read_output_data("idfdev", "sync-delete-output")
+    assert result.output == snapshot
     after = _get_app_secret(mock_vault, f"{base_vault_path}/gafaelfawr")
     assert "cilogon" in gafaelfawr
     assert "cilogon" not in after
@@ -306,6 +306,7 @@ def test_sync_onepassword(
     factory: Factory,
     mock_onepassword: MockOnepasswordClient,
     mock_vault: MockVaultClient,
+    snapshot: SnapshotAssertion,
 ) -> None:
     input_path = phalanx_test_path()
     config_storage = factory.create_config_storage()
@@ -324,8 +325,8 @@ def test_sync_onepassword(
         "minikube",
         env={"OP_CONNECT_TOKEN": "sometoken"},
     )
+    assert result.output == snapshot
     assert result.exit_code == 0
-    assert result.output == read_output_data("minikube", "sync-output")
 
     # Check that all static secrets were copied over correctly.
     with (input_path / "onepassword" / "minikube.yaml").open() as fh:
@@ -339,6 +340,11 @@ def test_sync_onepassword(
                 assert b64decode(value.encode()).decode() == vault[key]
             else:
                 assert value == vault[key]
+
+    # Check that the Gafaelfawr OpenID Connect clients secret is correct.
+    oidc_clients_secret = read_output_json("minikube", "oidc-clients")
+    vault = _get_app_secret(mock_vault, f"{base_vault_path}/gafaelfawr")
+    assert vault["oidc-server-secrets"] == json.dumps(oidc_clients_secret)
 
     # Check that the pull secret is correct.
     pull_secret = read_output_json("minikube", "pull-secret")
@@ -384,9 +390,9 @@ def test_sync_onepassword_errors(
         "minikube",
         env={"OP_CONNECT_TOKEN": "sometoken", "VAULT_TOKEN": "sometoken"},
     )
-    assert result.exit_code == 2
     assert app_name in result.output
     assert key in result.output
+    assert result.exit_code == 2
 
     # Instead set the secret to a value that is valid base64, but of binary
     # data that cannot be decoded to a string.
@@ -401,13 +407,13 @@ def test_sync_onepassword_errors(
         "minikube",
         env={"OP_CONNECT_TOKEN": "sometoken", "VAULT_TOKEN": "sometoken"},
     )
-    assert result.exit_code == 2
     assert app_name in result.output
     assert key in result.output
+    assert result.exit_code == 2
 
 
 def test_sync_regenerate(
-    factory: Factory, mock_vault: MockVaultClient
+    factory: Factory, mock_vault: MockVaultClient, snapshot: SnapshotAssertion
 ) -> None:
     input_path = phalanx_test_path()
     secrets_path = input_path / "secrets" / "idfdev.yaml"
@@ -427,8 +433,7 @@ def test_sync_regenerate(
         env={"VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 0
-    expected = read_output_data("idfdev", "sync-regenerate-output")
-    assert result.output == expected
+    assert result.output == snapshot
 
     # Check that all static secrets were copied over correctly.
     static_secrets = read_input_static_secrets("idfdev")
@@ -443,7 +448,6 @@ def test_sync_regenerate(
     # check that some secrets that would have been left alone without
     # --regenerate were regenerated and are syntactically valid.
     after = _get_app_secret(mock_vault, f"{base_vault_path}/gafaelfawr")
-    assert Token.from_str(after["bootstrap-token"])
     assert before["bootstrap-token"] != after["bootstrap-token"]
     assert re.match("^[0-9a-f]{64}$", after["redis-password"])
     assert before["redis-password"] != after["redis-password"]
@@ -459,7 +463,9 @@ def test_sync_regenerate(
     assert now - timedelta(seconds=5) <= mtime <= now
 
 
-def test_sync_exclude(factory: Factory, mock_vault: MockVaultClient) -> None:
+def test_sync_exclude(
+    factory: Factory, mock_vault: MockVaultClient, snapshot: SnapshotAssertion
+) -> None:
     input_path = phalanx_test_path()
     secrets_path = input_path / "secrets" / "idfdev.yaml"
     config_storage = factory.create_config_storage()
@@ -479,15 +485,11 @@ def test_sync_exclude(factory: Factory, mock_vault: MockVaultClient) -> None:
         env={"VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 0
-    all_output = read_output_data("idfdev", "sync-output").split("\n")
-    expected = "\n".join(
-        o for o in all_output if "argocd" not in o and "portal" not in o
-    )
-    assert result.output == expected
+    assert result.output == snapshot
 
 
 def test_sync_modify_delete(
-    factory: Factory, mock_vault: MockVaultClient
+    factory: Factory, mock_vault: MockVaultClient, snapshot: SnapshotAssertion
 ) -> None:
     """Test a sync that modifies and deletes a secret key at the same time."""
     input_path = phalanx_test_path()
@@ -518,7 +520,7 @@ def test_sync_modify_delete(
         env={"VAULT_TOKEN": "sometoken"},
     )
     assert result.exit_code == 0
-    expected = read_output_data("idfdev", "sync-gafaelfawr-output")
+    expected = snapshot
     assert result.output == expected
     after = _get_app_secret(mock_vault, f"{base_vault_path}/gafaelfawr")
     assert before["database-password"] != after["database-password"]

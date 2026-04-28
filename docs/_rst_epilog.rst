@@ -16,8 +16,12 @@
 .. _FastAPI: https://fastapi.tiangolo.com/
 .. _Felis: https://felis.lsst.io/
 .. _Gafaelfawr: https://gafaelfawr.lsst.io/
+.. _Google Cloud Key Management: https://cloud.google.com/security/products/security-key-management
+.. _Google Cloud Run: https://cloud.google.com/run
+.. _Google Cloud Storage: https://cloud.google.com/storage
 .. _Google Documentation Style Guide: https://developers.google.com/style/
 .. _Google Filestore: https://cloud.google.com/filestore
+.. _Google Kubernetes Engine: https://cloud.google.com/kubernetes-engine
 .. _Helm: https://helm.sh
 .. _helm-docs: https://github.com/norwoodj/helm-docs
 .. _Ingress: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -33,6 +37,7 @@
 .. _Pods:
 .. _Pod: https://kubernetes.io/docs/concepts/workloads/pods/
 .. _pre-commit: https://pre-commit.com
+.. _Repertoire: https://repertoire.lsst.io/
 .. _Roundtable: https://roundtable.lsst.io/
 .. _Ruff: https://docs.astral.sh/ruff/
 .. _Safir: https://safir.lsst.io/
@@ -42,12 +47,16 @@
 .. _Service: https://kubernetes.io/docs/concepts/services-networking/service/
 .. _SODA: https://ivoa.net/documents/SODA/
 .. _Sphinx: https://www.sphinx-doc.org/en/master/
+.. _SQuaRE Bot: https://squarebot.lsst.io/
+.. _syrupy: https://syrupy-project.github.io/syrupy/
+.. _syrupy docs: https://syrupy-project.github.io/syrupy/#cli-options
 .. _TAP: https://www.ivoa.net/documents/TAP/
 .. _Telegraf: https://www.influxdata.com/time-series-platform/telegraf/
 .. _tox: https://tox.wiki/en/latest/
+.. _uv: https://docs.astral.sh/uv/
 .. _UWS: https://www.ivoa.net/documents/UWS/
-.. _Vault: https://www.vaultproject.io/
+.. _Vault: https://developer.hashicorp.com/vault
 .. _Vault Secrets Operator: https://github.com/ricoberger/vault-secrets-operator
 .. _venv: https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment
 .. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
-.. _workload identity: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+.. _workload identity: https://docs.cloud.google.com/kubernetes-engine/docs/how-to/workload-identity

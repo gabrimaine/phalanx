@@ -14,6 +14,7 @@ x-butler-lfa-combo: &butler-lfa-combo
 atqueue:
   classifier: scriptqueue2
   image:
+    revision: 0
     repository: ts-dockerhub.lsst.org/scriptqueue
     pullPolicy: Always
   env:
@@ -60,15 +61,16 @@ atqueue:
         topologyKey: "kubernetes.io/hostname"
   resources:
     limits:
-      cpu: 5000m
-      memory: 10Gi
+      cpu: 8
+      memory: 48Gi
     requests:
-      cpu: 1000m
-      memory: 580Mi
+      cpu: 4
+      memory: 8Gi
 
 atscheduler:
   classifier: scheduler2
   image:
+    revision: 1
     repository: ts-dockerhub.lsst.org/scheduler
     pullPolicy: Always
   env:
@@ -83,8 +85,8 @@ atscheduler:
   - name: rubin-sim-data
     containerPath: /home/saluser/rubin_sim_data
     readOnly: false
-    server: nfs-scratch.cp.lsst.org
-    serverPath: /scratch/scheduler
+    server: nfs-project.cp.lsst.org
+    serverPath: /project/scheduler
   - name: obs-env
     containerPath: /net/obs-env
     readOnly: true
@@ -108,6 +110,7 @@ atscheduler:
 gis:
   enabled: true
   image:
+    revision: 0
     repository: ts-dockerhub.lsst.org/gis
     pullPolicy: Always
   secretFixup:
@@ -120,14 +123,15 @@ gis:
   resources:
     limits:
       cpu: 300m
-      memory: 300Mi
+      memory: 512Mi
     requests:
       cpu: 30m
-      memory: 97Mi
+      memory: 256Mi
 
 mtqueue:
   classifier: scriptqueue1
   image:
+    revision: 0
     repository: ts-dockerhub.lsst.org/scriptqueue
     pullPolicy: Always
   env:
@@ -175,14 +179,15 @@ mtqueue:
   resources:
     limits:
       cpu: 12
-      memory: 32Gi
+      memory: 48Gi
     requests:
-      cpu: 3
-      memory: 4Gi
+      cpu: 6
+      memory: 8Gi
 
 mtscheduler:
   classifier: scheduler1
   image:
+    revision: 1
     repository: ts-dockerhub.lsst.org/scheduler
     pullPolicy: Always
   env:
@@ -197,8 +202,8 @@ mtscheduler:
   - name: rubin-sim-data
     containerPath: /home/saluser/rubin_sim_data
     readOnly: false
-    server: nfs-scratch.cp.lsst.org
-    serverPath: /scratch/scheduler
+    server: nfs-project.cp.lsst.org
+    serverPath: /project/scheduler
   - name: obs-env
     containerPath: /net/obs-env
     readOnly: true
@@ -213,15 +218,16 @@ mtscheduler:
         topologyKey: "kubernetes.io/hostname"
   resources:
     limits:
-      cpu: 2700m
-      memory: 10000Mi
+      cpu: 10
+      memory: 20000Mi
     requests:
-      cpu: 270m
-      memory: 5000Mi
+      cpu: 6
+      memory: 15000Mi
 
 ocsqueue:
   classifier: scriptqueue3
   image:
+    revision: 0
     repository: ts-dockerhub.lsst.org/scriptqueue
     pullPolicy: Always
   env:
@@ -271,11 +277,12 @@ ocsqueue:
       memory: 10Gi
     requests:
       cpu: 1
-      memory: 430Mi
+      memory: 2Gi
 
 ocsscheduler:
   classifier: scheduler3
   image:
+    revision: 1
     repository: ts-dockerhub.lsst.org/scheduler
     pullPolicy: Always
   env:
@@ -290,8 +297,8 @@ ocsscheduler:
   - name: rubin-sim-data
     containerPath: /home/saluser/rubin_sim_data
     readOnly: false
-    server: nfs-scratch.cp.lsst.org
-    serverPath: /scratch/scheduler
+    server: nfs-project.cp.lsst.org
+    serverPath: /project/scheduler
   - name: obs-env
     containerPath: /net/obs-env
     readOnly: true
@@ -306,14 +313,15 @@ ocsscheduler:
         topologyKey: "kubernetes.io/hostname"
   resources:
     limits:
-      cpu: 2600m
+      cpu: 4
       memory: 10000Mi
     requests:
-      cpu: 260m
+      cpu: 1
       memory: 5000Mi
 
 watcher:
   image:
+    revision: 0
     repository: ts-dockerhub.lsst.org/watcher
     pullPolicy: Always
   envSecrets:
@@ -324,4 +332,4 @@ watcher:
       cpu: 3000m
     requests:
       cpu: 1000m
-      memory: 445Mi
+      memory: 1500Mi

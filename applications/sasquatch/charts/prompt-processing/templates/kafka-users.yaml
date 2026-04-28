@@ -33,19 +33,21 @@ spec:
           - Describe
       - resource:
           type: topic
-          name: "test.next-visit"
+          name: "summit.lsst.sal.ScriptQueue.logevent_nextVisit"
           patternType: literal
         type: allow
         host: "*"
         operations:
           - Read
           - Describe
+      {{- range $topic := .Values.topics }}
       - resource:
           type: topic
-          name: "test.next-visit-job"
+          name: {{ $topic }}
           patternType: literal
         type: allow
         host: "*"
         operations:
           - Read
           - Describe
+    {{- end }}

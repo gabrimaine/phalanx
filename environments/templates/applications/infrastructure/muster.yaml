@@ -1,0 +1,40 @@
+{{- if (index .Values "applications" "muster") -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "muster"
+  {{- if .Values.defaultComputeClass }}
+  labels:
+    cloud.google.com/default-compute-class: {{ .Values.defaultComputeClass }}
+  {{- end}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "muster"
+  namespace: "argocd"
+  finalizers:
+    - "resources-finalizer.argocd.argoproj.io"
+spec:
+  destination:
+    namespace: "muster"
+    server: "https://kubernetes.default.svc"
+  project: "infrastructure"
+  source:
+    path: "applications/muster"
+    repoURL: {{ .Values.repoUrl | quote }}
+    targetRevision: {{ or (index .Values "revisions" "muster") .Values.targetRevision | quote }}
+    helm:
+      parameters:
+        - name: "global.environmentName"
+          value: {{ .Values.name | quote }}
+        - name: "global.host"
+          value: {{ .Values.fqdn | quote }}
+        - name: "global.repertoireUrl"
+          value: "https://{{ .Values.fqdn }}/repertoire"
+        - name: "global.vaultSecretsPath"
+          value: {{ .Values.vaultPathPrefix | quote }}
+      valueFiles:
+        - "values.yaml"
+        - "values-{{ .Values.name }}.yaml"
+{{- end -}}

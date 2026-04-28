@@ -1,0 +1,47 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaUser
+metadata:
+  name: butler-writer
+  labels:
+    strimzi.io/cluster: {{ .Values.cluster.name }}
+spec:
+  authentication:
+    type: scram-sha-512
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: prompt-kafka
+          key: butler-writer-password
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: group
+          name: "*"
+          patternType: literal
+        operations:
+        - All
+      - resource:
+          type: topic
+          name: butler-writer
+          patternType: literal
+        type: allow
+        host: "*"
+        operations:
+        - All
+      - resource:
+          type: topic
+          name: butler-writer-ingestion-events
+          patternType: literal
+        type: allow
+        host: "*"
+        operations:
+        - All
+      - resource:
+          type: transactionalId
+          name: butler-writer-output
+          patternType: literal
+        type: allow
+        host: "*"
+        operations:
+        - All

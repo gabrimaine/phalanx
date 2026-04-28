@@ -14,8 +14,7 @@ Plot-navigator
 | config.separateSecrets | bool | `true` | Whether to use the new secrets management scheme |
 | config.volume_mounts | list | `[]` | Mount points for additional volumes |
 | config.volumes | list | `[]` | Additional volumes to attach |
-| environment | object | `{}` | Environment variables (e.g. butler configuration/auth parms) for the nextjs server |
-| global.baseUrl | string | Set by Argo CD | Base URL for the environment |
+| environment | object | `{"PRODUCTION_TOOLS_HOST":"production-tools.plot-navigator.svc.cluster.local"}` | Environment variables (e.g. butler configuration/auth parms) for the nextjs server |
 | global.host | string | Set by Argo CD | Host name for ingress |
 | global.vaultSecretsPath | string | Set by Argo CD | Base path for Vault secrets |
 | image.repository | string | `"ghcr.io/lsst-dm/plot-navigator"` | plot-navigator image to use |
@@ -24,3 +23,7 @@ Plot-navigator
 | redis.config.secretKey | string | `"password"` | Key inside secret from which to get the Redis password (do not change) |
 | redis.config.secretName | string | `"redis-secret"` | Name of secret containing Redis password |
 | resources | object | see `values.yaml` | Resource limits and requests for the nodejs pod |
+| worker.resources.limits.cpu | string | `"2"` |  |
+| worker.resources.limits.memory | string | `"2048Mi"` |  |
+| worker.resources.requests.cpu | string | `"1"` |  |
+| worker.resources.requests.memory | string | `"512Mi"` |  |

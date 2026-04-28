@@ -31,11 +31,7 @@ spec:
             - name: "SAFIR_PATH_PREFIX"
               value: {{ .Values.frontend.pathPrefix | quote }}
             - name: "AWS_SHARED_CREDENTIALS_FILE"
-{{- if .Values.separateSecrets }}
-              value: /etc/secrets/aws_credentials.ini
-{{- else }}
               value: /etc/secrets/aws-credentials.ini
-{{- end }}
             {{- if (not .Values.frontend.debug) }}
             - name: "SAFIR_PROFILE"
               value: "production"
@@ -72,16 +68,66 @@ spec:
                 - ALL
             readOnlyRootFilesystem: false
           volumeMounts:
-            - name: {{ $.Release.Name }}-secrets
+            - name: rubintv-secrets
               mountPath: "/etc/secrets"
+            {{- range $vol := .Values.frontend.pvcMountpoint }}
+            - name: {{ $vol.name }}
+              mountPath: {{ $vol.mountPath }}
+              {{- if ($vol.subPath) }}
+              subPath: {{ $vol.subPath }}
+              {{- end }}
+            {{- end }}
+            {{- range $vol := .Values.frontend.nfsMountpoint }}
+            - name: {{ $vol.name }}
+              mountPath: {{ $vol.containerPath }}
+              readOnly: {{ $vol.readOnly }}
+            {{- end }}
+      {{- if .Values.frontend.pvcMountpoint }}
+      initContainers:
+        {{- range $vol := .Values.frontend.pvcMountpoint }}
+        - name: "fix-pvc-ownership-{{ $vol.name }}"
+          image: "busybox"
+          command:
+            - "chown"
+            - "1000:1000"
+            - "{{ $vol.mountPath }}"
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          volumeMounts:
+            - name: {{ $vol.name }}
+              mountPath: {{ $vol.mountPath }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+        {{- end }}
+      {{- end }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
       volumes:
-        - name: {{ $.Release.Name }}-secrets
+        - name: rubintv-secrets
           secret:
-            secretName: {{ include "rubintv.fullname" . }}-secrets
+            secretName: rubintv-secrets
+        {{- range $vol := .Values.frontend.pvcMountpoint }}
+        - name: {{ $vol.name | quote }}
+          {{ with $vol.persistentVolumeClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .name | quote }}
+          {{- end }}
+        {{- end }}
+        {{- range $vol := .Values.frontend.nfsMountpoint }}
+        - name: {{ $vol.name | quote }}
+          nfs:
+            path: {{ $vol.serverPath }}
+            readOnly: {{ $vol.readOnly }}
+            server: {{ $vol.server }}
+        {{- end }}
       {{- with .Values.frontend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -1,13 +1,19 @@
 rubintv:
   siteTag: "usdf-prod"
-  separateSecrets: false
 
   imagePullSecrets:
   - name: pull-secret
 
   frontend:
     debug: true
+    image:
+      tag: v2.6.11
+      pullPolicy: Always
     env:
+    - name: RA_PULL_DIRECTORIES
+      value: "rubintv_analysis_service"
+    - name: SCRIPTS_LOCATION
+      value: "/repos/rubintv_analysis_service/scripts"
     - name: S3_ENDPOINT_URL
       value: &s3E "https://sdfembs3.sdf.slac.stanford.edu"
     - name: RAPID_ANALYSIS_LOCATION
@@ -18,15 +24,27 @@ rubintv:
       value: "/rubintv/ddv/"
     - name: DDV_CLIENT_WS_ADDRESS
       value: "rubintv/ws/ddv"
-    image:
-      tag: v2.6.6
-      pullPolicy: Always
+    pvcMountpoint:
+    - name: rubintv-scratch
+      persistentVolumeClaim:
+        name: rubintv-scratch
+        storageClassName: wekafs--sdf-k8s01
+        capacity: 1Gi
+      accessMode: ReadWriteMany
+      mountPath: /scratch
+    resources:
+      requests:
+        cpu: 1
+        memory: 3Gi
+      limits:
+        cpu: 2
+        memory: 6Gi
 
   workers:
     replicas: 1
     image:
-      repository: lsstts/rapid-analysis
-      tag: c0039_usdf
+      repository: ghcr.io/lsst-so/rubintv_production
+      tag: w_2025_38
       pullPolicy: Always
     uid: 17951
     gid: 4085
@@ -37,8 +55,12 @@ rubintv:
       value: *s3E
     - name: DAF_BUTLER_REPOSITORY_INDEX
       value: "s3://rubin-summit-users/data-repos.yaml"
+    - name: PGUSER
+      value: "rubin"
     - name: DEPLOY_BRANCH
       value: *dbE
+    - name: RA_PULL_DIRECTORIES
+      value: "rubintv_analysis_service"
     pvcMountpoint:
     - name: sdf-group-rubin
       persistentVolumeClaim:
@@ -63,6 +85,11 @@ rubintv:
       mountPath: /var/ddv-config
       subPath: shared/rubintv-ddv-config
     resources:
+      requests:
+        cpu: 1
+        memory: 4Gi
+        ephemeral-storage: 256Mi
       limits:
-        cpu: 2.0
-        memory: "8Gi"
+        cpu: 2
+        memory: 8Gi
+        ephemeral-storage: 512Mi

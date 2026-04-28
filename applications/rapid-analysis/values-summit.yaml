@@ -1,29 +1,42 @@
 image:
-  repository: ts-dockerhub.lsst.org/rapid-analysis
-  tag: c0040
+  repository: ghcr.io/lsst-so/rubintv_production
+  tag: w_2026_13
   pullPolicy: Always
 location: SUMMIT
 env:
   DAF_BUTLER_REPOSITORY_INDEX: /project/data-repos.yaml
+  DEPLOY_BRANCH: deploy-summit
   LSST_RESOURCES_S3_PROFILE_butler: https://s3-butler.cp.lsst.org
   AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
+  BUTLER_ROLLOUT_PAUSE: 1.0
+  RA_PULL_DIRECTORIES: "TARTS donut_viz drp_pipe ts_wep ts_ofc ts_config_mttcs summit_utils summit_extras rubintv_production daf_butler pipe_base"
+  TARTS_DATA_DIR: /project/rubintv/aos_data/TARTS
+  AI_DONUT_DATA_DIR: /project/rubintv/aos_data/AI_DONUT
+  # These threading env vars are the ones set in
+  # lsst.utils.disable_implicit_threading() They are being set here as well for
+  # extra safety as there is a possibility that code could init before that's
+  # called, at least in theory. Pods which want to take advantage of more cores
+  # can override these values at runtime.
+  OPENBLAS_NUM_THREADS: 1
+  GOTO_NUM_THREADS: 1
+  OMP_NUM_THREADS: 1
+  MKL_NUM_THREADS: 1
+  MKL_DOMAIN_NUM_THREADS: 1
+  MPI_NUM_THREADS: 1
+  NUMEXPR_NUM_THREADS: 1
+  NUMEXPR_MAX_THREADS: 1
+  OMP_PROC_BIND: false
+envSecrets:
+- name: SENTRY_DSN
+  secretName: rapid-analysis-secrets
+  secretKey: sentry.dsn
+securityContext:
+  uid: 73006
+  gid: 73006
 scripts:
 ###
 ### AuxTel pods
 ###
-# - name: summit/auxTel/runBackgroundService.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - allsky-data
-#   - project-shared
-#   resources:
-#     requests:
-#       cpu: 0.5
-#       memory: 4G
-#     limits:
-#       cpu: 1.0
-#       memory: 10G
 - name: LATISS/runButlerWatcher.py
   mounts:
   - auxtel-data
@@ -39,11 +52,6 @@ scripts:
   - auxtel-data
   - auxtel-gen3-data
   - project-shared
-# - name: LATISS/runOneOffCalexp.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
 - name: LATISS/runOneOffExpRecord.py
   mounts:
   - auxtel-data
@@ -61,161 +69,6 @@ scripts:
     limits:
       cpu: 1.0
       memory: 12G
-# - name: summit/auxTel/runCalibrateCcdRunner.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-# - name: summit/auxTel/runImExaminer.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-# - name: summit/auxTel/runIsrRunner.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-# - name: summit/auxTel/runMetadataCreator.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-# - name: summit/auxTel/runMetadataServer.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-# - name: summit/auxTel/runMonitor.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-#   resources:
-#     requests:
-#       cpu: 0.5
-#       memory: 1G
-#     limits:
-#       cpu: 1.0
-#       memory: 10G
-# - name: summit/auxTel/runMountTorquePlotter.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-# - name: summit/auxTel/runNightReporter.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-# - name: summit/auxTel/runSpecExaminer.py
-#   mounts:
-#   - auxtel-data
-#   - auxtel-gen3-data
-#   - project-shared
-#   resources:
-#     requests:
-#       cpu: 0.5
-#       memory: 2G
-#     limits:
-#       cpu: 1.0
-#       memory: 4G
-###
-### ComCamSim pods
-###
-# - name: LSSTComCamSim/runButlerWatcher.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCamSim/runHeadNode.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCamSim/runMetadataServer.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCamSim/runPlotter.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   resources:
-#     requests:
-#       cpu: 0.5
-#       memory: 4G
-#     limits:
-#       cpu: 1.0
-#       memory: 6G
-###
-### ComCam pods
-###
-# - name: LSSTComCam/runAosDonutPipeline.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   resources:
-#     requests:
-#       cpu: 32
-#       memory: 96G
-#     limits:
-#       cpu: 32
-#       memory: 96G
-# - name: LSSTComCam/runFocusSweepAnalysis.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   resources:
-#     requests:
-#       cpu: 0.5
-#       memory: 1G
-#     limits:
-#       cpu: 1
-#       memory: 2G
-# - name: LSSTComCam/runMetadataServerAos.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   resources:
-#     requests:
-#       cpu: 0.25
-#       memory: 500M
-#     limits:
-#       cpu: .5
-#       memory: 1G
-# - name: LSSTComCam/runOneOffExpRecord.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCam/runOneOffPostIsr.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCam/runOneOffCalexp.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCam/runPsfPlotting.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-  # resources:
-  #   requests:
-  #     cpu: .5
-  #     memory: 4G
-  #   limits:
-  #     cpu: 1
-  #     memory: 6G
 ###
 ### Misc pods
 ###
@@ -225,89 +78,21 @@ scripts:
   - project-shared
   resources:
     requests:
-      cpu: 1.0
-      memory: 4G
-    limits:
-      cpu: 2
-      memory: 6G
-- name: summit/misc/runStarTracker.py
-  mounts:
-  - project-shared
-- name: summit/misc/runStarTrackerCatchup.py
-  mounts:
-  - project-shared
-  resources:
-    requests:
-      cpu: 1.0
+      cpu: 2.0
       memory: 6G
     limits:
-      cpu: 1
+      cpu: 2.0
       memory: 8G
-- name: summit/misc/runStarTrackerFast.py
-  mounts:
-  - project-shared
-- name: summit/misc/runStarTrackerMetadata.py
-  mounts:
-  - project-shared
-- name: summit/misc/runStarTrackerNightReport.py
-  mounts:
-  - project-shared
-- name: summit/misc/runStarTrackerWide.py
-  mounts:
-  - project-shared
 - name: summit/misc/runTmaTelemetry.py
   mounts:
   - project-shared
   resources:
     requests:
-      cpu: 1
+      cpu: 1.0
       memory: 6G
     limits:
-      cpu: 1
+      cpu: 1.0
       memory: 8G
-- name: summit/misc/runSoarSeeingUploader.py
-  mounts:
-  - project-shared
-  resources:
-    requests:
-      cpu: .5
-      memory: 2G
-    limits:
-      cpu: .5
-      memory: 2G
-- name: summit/misc/runSoarSeeingScraper.py
-  mounts:
-  - project-shared
-  resources:
-    requests:
-      cpu: .5
-      memory: 4G
-    limits:
-      cpu: .5
-      memory: 4G
-###
-### ComCam pods
-###
-# - name: LSSTComCam/runButlerWatcher.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCam/runHeadNode.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCam/runMetadataServer.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-# - name: LSSTComCam/runPlotter.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
 ###
 ### LSSTCam pods
 ###
@@ -331,21 +116,133 @@ scripts:
   mounts:
   - lsstcam-data
   - project-shared
-- name: LSSTCam/runOneOffCalexp.py
-  mounts:
-  - lsstcam-data
-  - project-shared
-- name: LSSTCam/runPlotter.py
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 5G
+- name: LSSTCam/runOneOffVisitImage.py
   mounts:
   - lsstcam-data
   - project-shared
   resources:
     requests:
-      cpu: 1
+      cpu: 1.0
       memory: 8G
     limits:
-      cpu: 1
+      cpu: 1.0
+      memory: 10G
+- name: LSSTCam/runMetadataServerAos.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runMetadataServerGuiders.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runMetadataServerRaPerformance.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runCleanup.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 8G
+    limits:
+      cpu: 1.0
+      memory: 25G
+- name: LSSTCam/runPlotter.py
+  replicas: 2
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 8G
+    limits:
+      cpu: 1.0
       memory: 12G
+- name: LSSTCam/runPsfPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 3
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 6G
+    limits:
+      cpu: 1.0
+      memory: 10G
+- name: LSSTCam/runZernikePredictionPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 5
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 6G
+    limits:
+      cpu: 1.0
+      memory: 12G
+- name: LSSTCam/runPerformanceMonitor.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 5
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 6G
+    limits:
+      cpu: 1.0
+      memory: 8G
+- name: LSSTCam/runClusterManager.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runRadialPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 12G
+    limits:
+      cpu: 1.2
+      memory: 16G
+- name: LSSTCam/runFWHMPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 6G
+- name: LSSTCam/runGuiderAnalysis.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 8
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 6G
+    limits:
+      cpu: 1.2
+      memory: 8G
 ##
 ## LATISS StatefulSets
 ##
@@ -363,124 +260,20 @@ latissWorkerSet:
     limits:
       cpu: 1.0
       memory: 8G
-###
-### ComCamSim StatefulSets
-###
-# comcamsimWorkerSet:
-#   name: LSSTComCamSim/runSfmRunner.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 9
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: 4G
-#     limits:
-#       cpu: 1.0
-#       memory: 8G
-# comcamsimGather2aSet:
-#   name: LSSTComCamSim/runStep2aWorker.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 1
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: 4G
-#     limits:
-#       cpu: 1.0
-#       memory: 8G
-# comcamsimGatherRollupSet:
-#   name: LSSTComCamSim/runNightlyWorker.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 1
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: 12G
-#     limits:
-#       cpu: 1.0
-#       memory: 24G
-###
-### ComCam StatefulSets
-###
-# comcamWorkerSet:
-#   name: LSSTComCam/runSfmRunner.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 1
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: 4G
-#     limits:
-#       cpu: 1.0
-#       memory: 8G
-# comcamAosWorkerSet:
-#   name: LSSTComCam/runAosWorker.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 1
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: 4G
-#     limits:
-#       cpu: 1.0
-#       memory: 8G
-# comcamGather2aSet:
-#   name: LSSTComCam/runStep2aWorker.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 1
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: "4G"
-#     limits:
-#       cpu: 1.0
-#       memory: "8G"
-# comcamGather2aAosSet:
-#   name: LSSTComCam/runStep2aAosWorker.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 1
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: "4G"
-#     limits:
-#       cpu: 1.0
-#       memory: "8G"
-# comcamGatherRollupSet:
-#   name: LSSTComCam/runNightlyWorker.py
-#   mounts:
-#   - comcam-data
-#   - comcam-gen3-data
-#   - project-shared
-#   replicas: 1
-#   resources:
-#     requests:
-#       cpu: 1.0
-#       memory: "12G"
-#     limits:
-#       cpu: 1.0
-#       memory: "24G"
+latissGather1bSet:
+  name: LATISS/runStep1bWorker.py
+  mounts:
+  - auxtel-data
+  - auxtel-gen3-data
+  - project-shared
+  replicas: 2
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 8G
 ###
 ### LSSTCam StatefulSets
 ###
@@ -489,20 +282,83 @@ lsstcamWorkerSet:
   mounts:
   - lsstcam-data
   - project-shared
-  replicas: 378
+  replicas: 410
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.1
+      memory: 8G  # we should check this value
+lsstcamAosWorkerSet:
+  name: LSSTCam/runAosWorker.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 32  # 4 deep keeps up for all data except when there's IT trouble
+  env:
+    LIMITS_CPU: 4
+  resources:
+    requests:
+      cpu: 4.2
+      memory: 4G
+    limits:
+      cpu: 4.2
+      memory: 8G
+lsstcamGather1bSet:
+  name: LSSTCam/runStep1bWorker.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 12
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.1
+      memory: 8G
+lsstcamGather1bAosSet:
+  name: LSSTCam/runStep1bAosWorker.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 4
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.1
+      memory: 8G
+lsstcamBacklogWorkerSet:
+  name: LSSTCam/runBacklogWorker.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 50
   resources:
     requests:
       cpu: 1.0
       memory: 4G
     limits:
       cpu: 1.0
-      memory: 8G  # we should check this value
-credentialFile: google_write_creds
+      memory: 8G
+lsstcamGatherRollupSet:
+  name: LSSTCam/runNightlyWorker.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 1
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 12G
+    limits:
+      cpu: 1.0
+      memory: 24G
 pullSecretsPath: pull-secret
-rubinTvSecretsPath: rubintv
-credentialSecretsPath: rubintv-broadcaster
 butlerSecret:
-  key: butler-secret
   containerPath: /home/saluser/.lsst
   dbUser: oods
 imagePullSecrets:
@@ -518,16 +374,6 @@ nfsMountpoint:
   readOnly: true
   server: nfs-auxtel.cp.lsst.org
   serverPath: /auxtel/lsstdata/base/auxtel
-- name: comcam-data
-  containerPath: /repo/LSSTComCam
-  readOnly: false
-  server: nfs-comcam.cp.lsst.org
-  serverPath: /comcam/repo/LSSTComCam
-- name: comcam-gen3-data
-  containerPath: /data/lsstdata/base/comcam
-  readOnly: true
-  server: nfs-comcam.cp.lsst.org
-  serverPath: /comcam/lsstdata/base/comcam
 - name: lsstcam-data
   containerPath: /repo/LSSTCam
   readOnly: false
@@ -562,17 +408,17 @@ redis:
     MASTER: true
   envSecrets:
   - name: REDIS_PASSWORD
-    secretName: rubintv-secrets
+    secretName: rapid-analysis-secrets
     secretKey: redis-password
   storage:
     classname: rook-ceph-block
     request: 10Gi
   resources:
     requests:
-      cpu: 100m
-      memory: 1Gi
+      cpu: 2.0
+      memory: 25Gi
     limits:
-      cpu: 1
+      cpu: 3.0
       memory: 50Gi
 squid:
   enabled: true

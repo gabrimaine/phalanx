@@ -1,94 +1,75 @@
 image:
-  repository: ts-dockerhub.lsst.org/rapid-analysis
-  tag: c0040
+  repository: ghcr.io/lsst-so/rubintv_production
+  tag: w_2026_13
   pullPolicy: Always
+location: BTS
 env:
   DAF_BUTLER_REPOSITORY_INDEX: /project/data-repos.yaml
   DEPLOY_BRANCH: deploy-bts
   LSST_RESOURCES_S3_PROFILE_butler: https://s3-butler.ls.lsst.org
   AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
-siteTag: bts
-location: BTS
+  RAPID_ANALYSIS_DO_RAISE: True
+  BUTLER_ROLLOUT_PAUSE: 1.0
+  RA_PULL_DIRECTORIES: "TARTS donut_viz drp_pipe ts_wep ts_ofc ts_config_mttcs summit_utils summit_extras rubintv_production daf_butler pipe_base"
+  TARTS_DATA_DIR: /project/rubintv/aos_data/TARTS
+  AI_DONUT_DATA_DIR: /project/rubintv/aos_data/AI_DONUT
+  # These threading env vars are the ones set in
+  # lsst.utils.disable_implicit_threading() They are being set here as well for
+  # extra safety as there is a possibility that code could init before that's
+  # called, at least in theory. Pods which want to take advantage of more cores
+  # can override these values at runtime.
+  OPENBLAS_NUM_THREADS: 1
+  GOTO_NUM_THREADS: 1
+  OMP_NUM_THREADS: 1
+  MKL_NUM_THREADS: 1
+  MKL_DOMAIN_NUM_THREADS: 1
+  MPI_NUM_THREADS: 1
+  NUMEXPR_NUM_THREADS: 1
+  NUMEXPR_MAX_THREADS: 1
+  OMP_PROC_BIND: false
+envSecrets:
+- name: SENTRY_DSN
+  secretName: rapid-analysis-secrets
+  secretKey: sentry.dsn
+securityContext:
+  uid: 73006
+  gid: 73006
 scripts:
 ###
 ### AuxTel pods
 ###
-- name: summit/auxTel/runBackgroundService.py
+- name: LATISS/runButlerWatcher.py
+  mounts:
+  - auxtel-data
+  - auxtel-gen3-data
+  - project-shared
+- name: LATISS/runHeadNode.py
+  mounts:
+  - auxtel-data
+  - auxtel-gen3-data
+  - project-shared
+- name: LATISS/runMetadataServer.py
+  mounts:
+  - auxtel-data
+  - auxtel-gen3-data
+  - project-shared
+- name: LATISS/runOneOffExpRecord.py
+  mounts:
+  - auxtel-data
+  - auxtel-gen3-data
+  - project-shared
+- name: LATISS/runOneOffPostIsr.py
   mounts:
   - auxtel-data
   - auxtel-gen3-data
   - project-shared
   resources:
     requests:
-      cpu: 0.5
-      memory: 4G
+      cpu: 1.0
+      memory: 6G
     limits:
       cpu: 1.0
-      memory: 10G
-- name: summit/auxTel/runButlerWatcher.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runCalibrateCcdRunner.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runImExaminer.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runIsrRunner.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runMetadataCreator.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runMetadataServer.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runMonitor.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-  resources:
-    requests:
-      cpu: 0.5
-      memory: 1G
-    limits:
-      cpu: 1.0
-      memory: 10G
-- name: summit/auxTel/runMountTorquePlotter.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runNightReporter.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-- name: summit/auxTel/runSpecExaminer.py
-  mounts:
-  - auxtel-data
-  - auxtel-gen3-data
-  - project-shared
-  resources:
-    requests:
-      cpu: 0.5
-      memory: 2G
-    limits:
-      cpu: 1.0
-      memory: 4G
+      memory: 12G
 ###
 ### LSSTCam pods
 ###
@@ -104,7 +85,94 @@ scripts:
   mounts:
   - lsstcam-data
   - project-shared
+- name: LSSTCam/runOneOffExpRecord.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runOneOffPostIsr.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runOneOffVisitImage.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runMetadataServerAos.py
+  mounts:
+  - lsstcam-data
+  - project-shared
 - name: LSSTCam/runPlotter.py
+  replicas: 2
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 0.2
+      memory: 6G
+    limits:
+      cpu: 1.0
+      memory: 12G
+- name: LSSTCam/runPsfPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 8G
+- name: LSSTCam/runZernikePredictionPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 6G
+    limits:
+      cpu: 1.0
+      memory: 12G
+- name: LSSTCam/runCleanup.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 3G
+    limits:
+      cpu: 1.0
+      memory: 6G
+- name: LSSTCam/runClusterManager.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+- name: LSSTCam/runRadialPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 12G
+    limits:
+      cpu: 1.2
+      memory: 16G
+- name: LSSTCam/runFWHMPlotting.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 6G
+- name: LSSTCam/runGuiderAnalysis.py
   mounts:
   - lsstcam-data
   - project-shared
@@ -114,7 +182,38 @@ scripts:
       memory: 6G
     limits:
       cpu: 1.0
-      memory: 12G
+      memory: 8G
+##
+## LATISS StatefulSets
+##
+latissWorkerSet:
+  name: LATISS/runSfmRunner.py
+  mounts:
+  - auxtel-data
+  - auxtel-gen3-data
+  - project-shared
+  replicas: 1
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 3G
+    limits:
+      cpu: 1.0
+      memory: 6G
+latissGather1bSet:
+  name: LATISS/runStep1bWorker.py
+  mounts:
+  - auxtel-data
+  - auxtel-gen3-data
+  - project-shared
+  replicas: 1
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 8G
 ###
 ### LSSTCam StatefulSets
 ###
@@ -126,17 +225,30 @@ lsstcamWorkerSet:
   replicas: 189  # 1 deep for now
   resources:
     requests:
-      cpu: 1.0
+      cpu: 0.5
       memory: 4G
     limits:
       cpu: 1.0
-      memory: 8G  # we should check this value
+      memory: 6G  # we should check this value
 lsstcamAosWorkerSet:
   name: LSSTCam/runAosWorker.py
   mounts:
   - lsstcam-data
   - project-shared
-  replicas: 16  # 4 deep for corner chips
+  replicas: 16  # 2 deep for corner chips (8 of them)
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 8G
+lsstcamGather1bSet:
+  name: LSSTCam/runStep1bWorker.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 5
   resources:
     requests:
       cpu: 1.0
@@ -144,32 +256,19 @@ lsstcamAosWorkerSet:
     limits:
       cpu: 1.0
       memory: 8G
-lsstcamGather2aSet:
-  name: LSSTCam/runStep2aWorker.py
+lsstcamGather1bAosSet:
+  name: LSSTCam/runStep1bAosWorker.py
   mounts:
   - lsstcam-data
   - project-shared
-  replicas: 5
+  replicas: 3
   resources:
     requests:
-      cpu: 1.0
-      memory: "4G"
+      cpu: 0.5
+      memory: 4G
     limits:
       cpu: 1.0
-      memory: "8G"
-lsstcamGather2aAosSet:
-  name: LSSTCam/runStep2aAosWorker.py
-  mounts:
-  - lsstcam-data
-  - project-shared
-  replicas: 5
-  resources:
-    requests:
-      cpu: 1.0
-      memory: "4G"
-    limits:
-      cpu: 1.0
-      memory: "8G"
+      memory: 8G
 lsstcamGatherRollupSet:
   name: LSSTCam/runNightlyWorker.py
   mounts:
@@ -179,19 +278,25 @@ lsstcamGatherRollupSet:
   resources:
     requests:
       cpu: 1.0
-      memory: "12G"
+      memory: 12G
     limits:
       cpu: 1.0
-      memory: "24G"
-# TODO: remove google credentials
-credentialFile: google_write_creds
-vaultPrefixPath: secret/k8s_operator/base-lsp.lsst.codes
+      memory: 24G
+lsstcamBacklogWorkerSet:
+  name: LSSTCam/runBacklogWorker.py
+  mounts:
+  - lsstcam-data
+  - project-shared
+  replicas: 2
+  resources:
+    requests:
+      cpu: 1.0
+      memory: 4G
+    limits:
+      cpu: 1.0
+      memory: 8G
 pullSecretsPath: pull-secret
-rubinTvSecretsPath: rubintv
-# TODO: remove google credentials
-credentialSecretsPath: rubintv
 butlerSecret:
-  key: butler-secret
   containerPath: /home/saluser/.lsst
   dbUser: oods
 imagePullSecrets:
@@ -226,7 +331,7 @@ redis:
     MASTER: true
   envSecrets:
   - name: REDIS_PASSWORD
-    secretName: rubintv-secrets
+    secretName: rapid-analysis-secrets
     secretKey: redis-password
   storage:
     classname: rook-ceph-block
@@ -236,7 +341,7 @@ redis:
       cpu: 100m
       memory: 1Gi
     limits:
-      cpu: 1
+      cpu: 1.0
       memory: 50Gi
 squid:
   enabled: true

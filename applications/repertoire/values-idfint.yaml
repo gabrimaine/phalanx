@@ -1,0 +1,27 @@
+config:
+  availableDatasets:
+    - "dp02"
+    - "dp03"
+    - "dp1"
+    - "prompt"
+  hips:
+    legacy:
+      dataset: "dp1"
+  metrics:
+    enabled: true
+  slackAlerts: true
+  tap:
+    schemaVersion: "releases/w.2026.15"
+    schemaSourceTemplate: "gs://rubin-sdm-schemas-artifacts/{version}/schemas.tar.gz"
+    servers:
+      tap:
+        enabled: true
+      ssotap:
+        enabled: true
+  useSubdomains:
+    - "nublado"
+
+cloudsql:
+  enabled: true
+  instanceConnectionName: "science-platform-int-dc5d:us-central1:science-platform-int-8f439af2"
+  serviceAccount: "repertoire@science-platform-int-dc5d.iam.gserviceaccount.com"
