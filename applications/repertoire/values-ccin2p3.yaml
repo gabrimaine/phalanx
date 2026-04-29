@@ -1,0 +1,9 @@
+config:
+  availableDatasets:
+    - "dp02"
+  tap:
+    schemaVersion: "2.4.1"
+    schemaSourceTemplate: "https://github.com/gabrimaine/sdm_schemas/releases/download/{version}/datalink-snippets.zip"
+    servers:
+      tap:
+        enabled: true
