@@ -3,6 +3,7 @@ fqdn: data-dev.lsst.eu
 vaultPathPrefix: secret/phalanx/ccin2p3
 
 applications:
+  lsst-indigo-iam: true
   nublado: true
   portal: true
   postgres: true

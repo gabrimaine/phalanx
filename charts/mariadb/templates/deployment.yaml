@@ -1,0 +1,78 @@
+{{- if .Values.mariadb.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mariadb.fullname" . }}
+  labels: {{ include "mariadb.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "mariadb.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "mariadb.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsUser: 1003790000
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: MARIADB_DATABASE
+          value: {{ .Values.mariadb.database }}
+        - name: MARIADB_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mariadb.user.secret | default "mariadb-secret" }}
+              key: user
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mariadb.rootPassword.secret | default "mariadb-secret" }}
+              key: {{ .Values.mariadb.rootPassword.key | default "root-password" }}
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mariadb.userPassword.secret | default "mariadb-secret" }}
+              key: {{ .Values.mariadb.userPassword.key | default "user-password" }}
+        ports:
+        - containerPort: {{ .Values.container.port }}
+          name: mariadb
+        volumeMounts:
+        - name: mariadb-data
+          mountPath: /var/lib/mysql
+        - name: mariadb-init
+          mountPath: /docker-entrypoint-initdb.d/
+        livenessProbe:
+          exec:
+            command:
+              - "sh"
+              - "-c"
+              - "mariadb-admin ping -u root -p${MARIADB_ROOT_PASSWORD}"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+              - "sh"
+              - "-c"
+              - "mariadb-admin ping -u root -p${MARIADB_ROOT_PASSWORD}"
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 1
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: mariadb-data
+        persistentVolumeClaim:
+          claimName: {{ include "mariadb.fullname" . }}-pvc
+      - name: mariadb-init
+        configMap:
+          name: {{ .Values.initdbScript.configMap | default "mariadb-init-script" }}
+{{- end }}

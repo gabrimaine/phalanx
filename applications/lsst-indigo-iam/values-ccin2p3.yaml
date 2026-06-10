@@ -1,0 +1,21 @@
+ingress:
+  host: "lsst-iam.data-dev.lsst.eu"
+
+iam:
+  token:
+    includeScope: "true"
+
+persistentvolume:
+  class: "rsp-local-storage"
+
+mail:
+  host: "zrelay.in2p3.fr"
+  port: "25"
+  secretName: "mail-secret"
+
+mariadb:
+  persistentvolume:
+    create: false
+    class: "rsp-local-storage"
+    size: 5Gi
+    reclaimPolicy: Retain

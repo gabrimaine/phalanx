@@ -1,0 +1,16 @@
+{{- if .Values.service.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.redis.serviceName }}
+  labels: {{- include "redis.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  #clusterIP: None  # Headless mode!
+  selector:
+    {{- include "redis.selectorLabels" . | nindent 6 }}
+  ports:
+  - port: {{ .Values.global.redis.port }}
+    targetPort: {{ .Values.global.redis.port }}
+    name: redis-port
+{{- end }}

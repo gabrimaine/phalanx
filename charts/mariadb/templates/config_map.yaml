@@ -1,0 +1,11 @@
+{{- if .Values.mariadb.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-init-script
+data:
+  01-create-db.sql: |
+    CREATE DATABASE IF NOT EXISTS $MARIADB_DATABASE;
+    CREATE USER IF NOT EXISTS '$MARIADB_USER'@'%' IDENTIFIED BY '$MARIADB_PASSWORD';
+    GRANT ALL PRIVILEGES ON $MARIADB_DATABASE.* TO '$MARIADB_USER'@'%';
+{{- end }}

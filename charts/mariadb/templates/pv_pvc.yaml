@@ -1,0 +1,44 @@
+{{- if .Values.mariadb.enabled -}}
+{{- if .Values.persistentvolume.create -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "mariadb.fullname" . }}-pv
+  labels: {{ include "mariadb.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.persistentvolume.class | default "" }}
+  capacity:
+    storage: {{ .Values.persistentvolume.size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: {{ .Values.persistentvolume.reclaimPolicy | default "Retain" }}
+  {{- if .Values.persistentvolume.hostPath }}
+  hostPath:
+    path: {{ .Values.persistentvolume.path }}
+  {{- else if .Values.persistentvolume.local }}
+  local:
+    path: {{ .Values.persistentvolume.path }}
+  {{- end }}
+---
+{{- end }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mariadb.fullname" . }}-pvc
+  labels: {{ include "mariadb.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.persistentvolume.class | default "" }}
+  resources:
+    requests:
+      storage: {{ .Values.persistentvolume.size }}
+  # {{- if .Values.persistentvolume.create }}
+  # selector:
+  #   matchLabels:
+  #     app.kubernetes.io/name: {{ include "mariadb.name" . }}
+  #     app.kubernetes.io/instance: {{ .Release.Name }}
+  # {{- end }}
+---
+{{- end }}

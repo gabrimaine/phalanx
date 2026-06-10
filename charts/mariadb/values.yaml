@@ -1,0 +1,47 @@
+replicaCount: 1
+nameOverride: mariadb
+initdbScript:
+  configMap: "mariadb-init-script"
+  key: "data"
+
+
+image:
+  repository: bitnami/mariadb
+  tag: "11.8.2"         # Version (matches Chart.yaml's AppVersion)
+  pullPolicy: IfNotPresent
+
+
+mariadb:
+  enabled: true
+  database: ""
+  rootPassword:
+    secret: "mariadb-secret"
+    key: "root-password"
+  userPassword:
+    secret: "mariadb-secret"
+    key: "user-password"
+  user:
+    secret: "mariadb-secret"
+    key: "user"
+container:
+  port: 3306
+
+resources: {}
+  # requests:
+  #   cpu: "500m"
+  #   memory: "128Mi"
+  # limits:
+  #   cpu: "1"
+  #   memory: "256Mi"
+
+persistentvolume:
+  # create: false
+  # class: "rsp-local-storage"
+  # size: 5Gi
+  # reclaimPolicy: Retain
+  path: /tmp/data/mariadb  # Required for hostPath/local
+  hostPath: true #set true to use it
+  local: false
+
+# persistence:
+#   existingClaim: mariadb-pvc

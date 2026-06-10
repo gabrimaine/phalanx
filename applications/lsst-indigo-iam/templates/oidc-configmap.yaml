@@ -1,0 +1,24 @@
+{{- if .Values.oidc.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.oidc.configMap | default "oidc-env-conf" }}-conf
+  labels: {{- include "lsst-indigo-iam.labels" . | nindent 4 }}
+data:
+  application-oidc.yaml: |
+    oidc:
+      providers:
+      - name: ${IAM_OIDC_PROVIDER}
+        issuer: ${IAM_CHECKIN_ISSUER}
+        client:
+          clientId: ${IAM_CHECKIN_CLIENT_ID}
+          clientSecret: ${IAM_CHECKIN_CLIENT_SECRET}
+          redirectUris: ${IAM_BASE_URL}/openid_connect_login
+          scope: ${IAM_CHECKIN_CLIENT_SCOPE:openid,profile,email}
+        loginButton:
+          text: ${OIDC_BUTTON_TEXT}
+          title: ${OIDC_BUTTON_TITLE}
+          image:
+            url: ${OIDC_IMAGE}
+            size: small
+{{- end }}

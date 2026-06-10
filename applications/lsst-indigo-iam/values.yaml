@@ -1,0 +1,168 @@
+# Default values for lsst-indigo-iam.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Global configuration shared across subcharts
+global:
+  # -- Redis host
+  host: null
+
+  # -- Base URL for the environment
+  baseUrl: null
+
+  # -- Environment name
+  environmentName: null
+
+  # -- Repertoire URL
+  repertoireUrl: null
+
+  # -- Base path for Vault secrets
+  vaultSecretsPath: null
+
+  # -- Host name for ingress
+  # @default -- Set by Argo CD
+  redis:
+    host: "localhost"
+    serviceName: "redis-svc"
+    port: 6379
+
+  # -- MariaDB service configuration
+  mariadb:
+    serviceName: "mariadb-svc"
+
+  # -- IAM service configuration
+  iam:
+    serviceName: "iam-svc"
+    ingress:
+      serviceName: "iam-ingress"
+
+# -- Number of replicas
+replicaCount: 3
+
+# -- Image configuration
+image:
+  repository: "indigoiam/iam-login-service"
+  # -- Tag of the IAM login service image to use
+  tag: "v1.12.3"
+  pullPolicy: IfNotPresent
+
+# -- Container port configuration
+container:
+  port: 8080
+  portDebug: 1443
+
+# -- Persistent volume configuration
+persistentvolume:
+  # -- Whether to create a persistent volume
+  create: true
+  # -- Storage class for the persistent volume
+  class: "standard"
+  # -- Size of the persistent volume
+  size: 5Gi
+  path: "/mnt/iam-logs"
+
+# -- Resource requests and limits
+resources:
+  requests:
+    cpu: "1"
+    memory: "1.5Gi"
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+
+# -- Security context
+securityContext:
+  runAsUser: "1003790000"
+
+# -- Ingress configuration
+ingress:
+  enabled: true
+  host: null
+
+# -- OIDC configuration
+oidc:
+  enabled: false
+
+# -- Mail configuration
+mail:
+  host: "zrelay.in2p3.fr"
+  port: "25"
+  secretName: "mail-secret"
+
+# -- IAM service core configuration
+iam:
+  host: null
+  port: 8080
+  topbar: "INDIGO IAM for Rubin Observatory Community"
+  organisation: "Vera C. Rubin Observatory"
+  jwt: "wlcg"
+  tokenValidity: 259200
+  javaOpts: "-Dspring.profiles.active=prod,oidc,mysql,registration,redis"
+  logo:
+    url: "https://doc.lsst.eu/_static/lsst-france-logo.png"
+  cache:
+    redisEnabled: "true"
+  session:
+    storeType: "redis"
+  token:
+    includeAuthnInfo: "false"
+    includeScope: "true"
+    includeNbf: "false"
+    scopes: "openid profile email"
+  security:
+    forwardHeaders: "native"
+  # -- Redis connection for the IAM service
+  redis:
+    host: "redis-svc"
+    port: 6379
+
+# -- Database configuration
+database:
+  host: "mariadb-svc"
+  port: 3306
+  name: "lsst_iam"
+  secretName: "mariadb-secret"
+
+# -- MariaDB configuration
+# @default -- See the `values.yaml` file.
+mariadb:
+  # -- Number of replicas
+  replicaCount: 1
+
+  # -- Image configuration
+  image:
+    # -- Tag of the MariaDB image to use
+    tag: "11.8.2"
+
+  # -- MariaDB core configuration
+  mariadb:
+    # -- Enable MariaDB
+    enabled: true
+    # -- Database name
+    database: "lsst_iam"
+
+  # -- Resource requests and limits
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "128Mi"
+    limits:
+      cpu: "1"
+      memory: "256Mi"
+
+  # -- Persistent volume configuration
+  persistentvolume:
+    create: false
+    class: "standard"
+    size: 5Gi
+    reclaimPolicy: Retain
+
+# -- Redis configuration
+# @default -- See the `values.yaml` file.
+redis:
+  # -- Enable Redis
+  enabled: true
+
+  # -- Service configuration
+  service:
+    enabled: true

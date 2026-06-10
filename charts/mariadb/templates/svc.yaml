@@ -1,0 +1,15 @@
+{{- if .Values.mariadb.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.mariadb.serviceName }}
+  labels: {{- include "mariadb.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "mariadb.selectorLabels" . | nindent 6 }}
+  ports:
+  - port: {{ .Values.container.port }}
+    targetPort: {{ .Values.container.port }}
+    name: mariadb-port
+{{- end }}

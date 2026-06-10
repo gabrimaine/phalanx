@@ -41,6 +41,7 @@
 | applications.keda | bool | `false` | Enable the keda application |
 | applications.livetap | bool | `false` | Enable the livetap application |
 | applications.love | bool | `false` | Enable the love control system application |
+| applications.lsst-indigo-iam | bool | `false` | Enable the lsst-indigo-iam application |
 | applications.mobu | bool | `false` | Enable the mobu application |
 | applications.mpsky | bool | `false` | Enable the mpsky application |
 | applications.muster | bool | `false` | Enable the muster application |

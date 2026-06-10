@@ -1,0 +1,36 @@
+# Global Redis configuration
+replicaCount: 1  # Number of Redis replicas (for HA, use odd numbers like 3)
+nameOverride: redis
+# Image settings
+image:
+  repository: redis  # Official Redis image
+  tag: "8.0.3"         # Version (matches Chart.yaml's AppVersion)
+  pullPolicy: IfNotPresent  # Options: Always, IfNotPresent, Never
+
+# Container settings
+container:
+  port: 6379  # Default Redis port
+
+# Persistence (PVC)
+persistence:
+  size: 8Gi   # Storage size per pod (adjust based on needs)
+  # accessModes: ReadWriteOnce (defined in StatefulSet)
+
+# Resource limits (adjust based on workload)
+resources:
+  requests:
+    cpu: "250m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "192Mi"
+
+# Service configuration
+service:
+  enabled: true  # Headless Service for StatefulSet
+  # clusterIP: None (defined in Service template)
+
+# Security (matches StatefulSet's securityContext)
+securityContext:
+  runAsUser: 1003790000
+  #fsGroup: 1000

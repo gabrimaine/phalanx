@@ -1,0 +1,205 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "lsst-indigo-iam.fullname" . }}
+  labels: {{ include "lsst-indigo-iam.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 2 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      {{- include "lsst-indigo-iam.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "lsst-indigo-iam.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: tier
+                    operator: In
+                    values: ["login-service"]
+              topologyKey: kubernetes.io/hostname
+      volumes:
+        - name: json-keystore-secret-vol
+          secret:
+            secretName: json-keystore-secret
+            items:
+              - key: keystore.jwks
+                path: keystore.jwks
+        - name: temp-volume
+          emptyDir: {}
+        - name: iam-logs
+          persistentVolumeClaim:
+            claimName: {{ include "lsst-indigo-iam.fullname" . }}
+        {{- if .Values.oidc.enabled }}
+        - name: indigo-conf
+          configMap:
+            name: {{ .Values.oidc.configMap | default "oidc-env-conf" }}-conf
+            items:
+              - key: application-oidc.yaml
+                path: application-oidc.yaml
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            allowPrivilegeEscalation: false
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.container.port }}
+              name: http
+            - containerPort: {{ .Values.container.portDebug |default 1044 }}
+              name: debug
+          volumeMounts:
+            - name: json-keystore-secret-vol
+              mountPath: /secrets/json-keystore
+              readOnly: true
+            {{- if .Values.oidc.enabled }}
+            - name: indigo-conf
+              mountPath: /indigo-iam/config/
+            {{- end}}
+            - name: temp-volume
+              mountPath: /tmp
+            - name: iam-logs
+              mountPath: {{ .Values.persistentvolume.path | quote }}
+          env:
+           # Redis Config
+           - name: IAM_SPRING_REDIS_HOST
+             value: {{ .Values.iam.redis.host | quote }}
+           - name: IAM_SPRING_REDIS_PORT
+             value: {{ .Values.iam.redis.port | quote }}
+           - name: IAM_HEALTH_REDIS_PROBE_ENABLED
+             value: {{ .Values.iam.redis.probeEnabled | default "true" | quote }}
+
+           # IAM Core Config
+           - name: IAM_BASE_URL
+             value: "https://{{ .Values.iam.host }}" #:{{ .Values.iam.port }}"
+           - name: IAM_PORT
+             value: {{ .Values.iam.port | quote }}
+           - name: IAM_ISSUER
+             value: "https://{{ .Values.iam.host }}" #:{{ .Values.iam.port }}"
+           - name: IAM_TOPBAR_TITLE
+             value: {{ .Values.iam.topbar | quote }}
+           - name: IAM_ORGANISATION_NAME
+             value: {{ .Values.iam.organisation | quote }}
+           - name: IAM_JWT_DEFAULT_PROFILE
+             value: {{ .Values.iam.jwt | default "wlcg" | quote }}
+           - name: IAM_DEFAULT_ACCESS_TOKEN_VALIDITY_SECONDS
+             value: {{ .Values.iam.tokenValidity | quote }}
+           - name: IAM_JAVA_OPTS
+             value: {{ .Values.iam.javaOpts | quote }}
+           - name: IAM_TOMCAT_ACCESS_LOG_DIRECTORY
+             value: {{ .Values.persistentvolume.path | quote }}
+
+           # UI/Logo
+           - name: IAM_LOGO_URL
+             value: {{ .Values.iam.logo.url | quote }}
+           - name: IAM_LOGO_DIMENSION
+             value: {{ .Values.iam.logo.dimension | default "200" | quote }}
+           - name: IAM_LOGO_HEIGHT
+             value: {{ .Values.iam.logo.height | default "150" | quote }}
+           - name: IAM_LOGO_WIDTH
+             value: {{ .Values.iam.logo.width | default "200" | quote }}
+
+           # Session/Cache
+           - name: IAM_CACHE_REDIS_ENABLED
+             value: {{ .Values.iam.cache.redisEnabled | default "true" | quote }}
+           - name: IAM_SPRING_SESSION_STORE_TYPE
+             value: {{ .Values.iam.session.storeType | default "redis" | quote }}
+
+           # Security/Token
+           - name: IAM_ACCESS_TOKEN_INCLUDE_AUTHN_INFO
+             value: {{ .Values.iam.token.includeAuthnInfo | default "false" | quote }}
+           - name: IAM_ACCESS_TOKEN_INCLUDE_SCOPE
+             value: {{ .Values.iam.token.includeScope | default "true" | quote }}
+           - name: IAM_CLIENT_SCOPES
+             value: {{ .Values.iam.token.scopes | quote }}
+           - name: IAM_ACCESS_TOKEN_INCLUDE_NBF
+             value: {{ .Values.iam.token.includeNbf | default "false" | quote }}
+           - name: IAM_FORWARD_HEADERS_STRATEGY
+             value: {{ .Values.iam.security.forwardHeaders | default "none" | quote }}
+           - name: IAM_KEY_STORE_LOCATION
+             value: file:///secrets/json-keystore/keystore.jwks
+           # Database
+           - name: IAM_DB_HOST
+             value: {{ .Values.database.host | default "mariadb-svc" | quote }}
+           - name: IAM_DB_PORT
+             value: {{ .Values.database.port | default "3306" | quote }}
+           - name: IAM_DB_NAME
+             value: {{ .Values.database.name | default "lsst_iam" | quote }}
+           - name: IAM_DB_USERNAME
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.database.secretName | default "mariadb-secret" }}
+                 key: user
+           - name: IAM_DB_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.database.secretName | default "mariadb-secret" }}
+                 key: user-password
+
+           # Mail
+           - name: IAM_MAIL_HOST
+             value: {{ .Values.mail.host | default "zrelay.in2p3.fr" | quote }}
+           - name: IAM_MAIL_PORT
+             value: {{ .Values.mail.port | default "25" | quote }}
+           - name: IAM_MAIL_USERNAME
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.mail.secretName | default "mail-secret" }}
+                 key: username
+           - name: IAM_MAIL_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.mail.secretName | default "mail-secret" }}
+                 key: password
+           - name: IAM_NOTIFICATION_FROM
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.mail.secretName | default "mail-secret" }}
+                 key: mail
+           - name: IAM_NOTIFICATION_ADMIN_ADDRESS
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.mail.secretName | default "mail-secret" }}
+                 key: mail
+
+           # OIDC (CC-IN2P3)
+           {{- if .Values.oidc.enabled }}
+           - name: IAM_OIDC_PROVIDER
+             value: {{ .Values.oidc.provider | default "ccin2p3" | quote }}
+           - name: IAM_CHECKIN_ISSUER
+             value: {{ .Values.oidc.issuer | default "https://login.cc.in2p3.fr/auth/realms/cc.in2p3.fr" | quote }}
+           - name: IAM_CHECKIN_CLIENT_SCOPE
+             value: {{ .Values.oidc.scope | default "openid email groups posix_account profile" | quote }}
+           - name: OIDC_BUTTON_TEXT
+             value: {{ (index .Values.oidc "button").text | default "CC-IN2P3 SSO" | quote }}
+           - name: OIDC_BUTTON_TITLE
+             value: {{ (index .Values.oidc "button").title | default "Sign in with CC-IN2P3 SSO" | quote }}
+           - name: OIDC_IMAGE
+             value: {{ (index .Values.oidc "button").image | default "https://cc.in2p3.fr/wp-content/uploads/2018/03/logosimpleCC.jpg" | quote }}
+           - name: IAM_CHECKIN_CLIENT_ID
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.oidc.secretName | default "oidc-client-secret" }}
+                 key: clientId
+           - name: IAM_CHECKIN_CLIENT_SECRET
+             valueFrom:
+               secretKeyRef:
+                 name: {{ .Values.oidc.secretName | default "oidc-client-secret" }}
+                 key: clientSecret
+            {{- end }}
+

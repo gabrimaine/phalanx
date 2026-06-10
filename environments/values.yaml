@@ -122,6 +122,9 @@ applications:
   # -- Enable the hoverdrive application
   hoverdrive: false
 
+  # -- Enable the lsst-indigo-iam application
+  lsst-indigo-iam: false
+
   # -- Enable the muster application
   muster: false
 
