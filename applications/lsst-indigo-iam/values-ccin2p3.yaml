@@ -19,3 +19,6 @@ mariadb:
     class: "mariadb-local-storage"
     size: 5Gi
     reclaimPolicy: Retain
+redis:
+  persistence:
+    storageClass: "redis-rsp-localstorage"
