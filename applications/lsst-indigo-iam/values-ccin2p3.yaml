@@ -4,6 +4,8 @@ ingress:
 
 iam:
   host: "data-dev.lsst.eu/iam"
+  security:
+    forwardHeaders: "framework"
   token:
     includeScope: "true"
 
