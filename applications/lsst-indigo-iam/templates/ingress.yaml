@@ -1,4 +1,6 @@
 {{- if .Values.ingress.enabled -}}
+{{- $path := .Values.ingress.path | default "/" -}}
+{{- $isSubPath := ne $path "/" -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,13 +9,16 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    {{- if $isSubPath }}
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ $path | quote }}
+    {{- end }}
 spec:
   ingressClassName: "nginx"
   rules:
     - host: {{ required "ingress.host must be set" .Values.ingress.host | quote }}
       http:
         paths:
-          - path: "/"
+          - path: {{ $path | quote }}
             pathType: "Prefix"
             backend:
               service:

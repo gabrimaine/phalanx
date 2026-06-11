@@ -221,6 +221,13 @@ config:
         datasets:
           - "live"
         template: "https://{{base_hostname}}/api/livetap"
+    lsst-indigo-iam:
+      - type: "internal"
+        name: "iam"
+        template: "https://{{base_hostname}}/iam"
+      - type: "ui"
+        name: "indigo-iam"
+        template: "https://{{base_hostname}}/iam"
     mobu:
       - type: "internal"
         name: "mobu"
