@@ -24,8 +24,8 @@ Indigo-IAM for LSST Community
 | ingress | object | `{"enabled":true,"host":null}` | Ingress configuration |
 | mail | object | `{"host":"zrelay.in2p3.fr","port":"25","secretName":"mail-secret"}` | Mail configuration |
 | mariadb | object | See the `values.yaml` file. | MariaDB configuration |
-| mariadb.image | object | `{"tag":"11.8.2"}` | Image configuration |
-| mariadb.image.tag | string | `"11.8.2"` | Tag of the MariaDB image to use |
+| mariadb.image | object | `{"tag":"11.4"}` | Image configuration |
+| mariadb.image.tag | string | `"11.4"` | Tag of the MariaDB image to use |
 | mariadb.mariadb | object | `{"database":"lsst_iam","enabled":true}` | MariaDB core configuration |
 | mariadb.mariadb.database | string | `"lsst_iam"` | Database name |
 | mariadb.mariadb.enabled | bool | `true` | Enable MariaDB |

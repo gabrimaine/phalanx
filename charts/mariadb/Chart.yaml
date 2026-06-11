@@ -3,4 +3,4 @@ name: mariadb
 description: MariaDB Helm chart
 type: application
 version: 1.0.0
-appVersion: "11.8.2"
+appVersion: "11.4"

@@ -6,8 +6,8 @@ initdbScript:
 
 
 image:
-  repository: bitnami/mariadb
-  tag: "11.8.2"         # Version (matches Chart.yaml's AppVersion)
+  repository: mariadb
+  tag: "11.4"         # Version (matches Chart.yaml's AppVersion)
   pullPolicy: IfNotPresent
 
 

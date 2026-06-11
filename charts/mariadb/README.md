@@ -8,8 +8,8 @@ MariaDB Helm chart
 |-----|------|---------|-------------|
 | container.port | int | `3306` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"bitnami/mariadb"` |  |
-| image.tag | string | `"11.8.2"` |  |
+| image.repository | string | `"mariadb"` |  |
+| image.tag | string | `"11.4"` |  |
 | initdbScript.configMap | string | `"mariadb-init-script"` |  |
 | initdbScript.key | string | `"data"` |  |
 | mariadb.database | string | `""` |  |
