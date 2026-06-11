@@ -4,6 +4,7 @@ ingress:
 
 iam:
   host: "data-dev.lsst.eu/iam"
+  javaOpts: "-Dspring.profiles.active=prod,oidc,mysql,registration,redis -Dserver.servlet.context-path=/iam"
   token:
     includeScope: "true"
 
