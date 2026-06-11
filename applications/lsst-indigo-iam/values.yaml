@@ -68,6 +68,8 @@ securityContext:
 ingress:
   enabled: true
   host: null
+  # -- Path prefix for the ingress
+  path: "/"
 
 # -- OIDC configuration
 oidc:
