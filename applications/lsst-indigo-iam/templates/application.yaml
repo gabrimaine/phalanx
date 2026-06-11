@@ -40,8 +40,7 @@ spec:
         - name: temp-volume
           emptyDir: {}
         - name: iam-logs
-          persistentVolumeClaim:
-            claimName: {{ include "lsst-indigo-iam.fullname" . }}
+          emptyDir: {}
         {{- if .Values.oidc.enabled }}
         - name: indigo-conf
           configMap:
@@ -74,7 +73,7 @@ spec:
             - name: temp-volume
               mountPath: /tmp
             - name: iam-logs
-              mountPath: {{ .Values.persistentvolume.path | quote }}
+              mountPath: /var/log/iam
           env:
            # Redis Config
            - name: IAM_SPRING_REDIS_HOST
@@ -102,7 +101,7 @@ spec:
            - name: IAM_JAVA_OPTS
              value: {{ .Values.iam.javaOpts | quote }}
            - name: IAM_TOMCAT_ACCESS_LOG_DIRECTORY
-             value: {{ .Values.persistentvolume.path | quote }}
+             value: "/var/log/iam"
 
            # UI/Logo
            - name: IAM_LOGO_URL

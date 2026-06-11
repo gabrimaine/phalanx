@@ -16,6 +16,6 @@ mail:
 mariadb:
   persistentvolume:
     create: false
-    class: "rsp-local-storage"
+    class: "mariadb-local-storage"
     size: 5Gi
     reclaimPolicy: Retain

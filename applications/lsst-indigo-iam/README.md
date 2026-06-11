@@ -29,16 +29,14 @@ Indigo-IAM for LSST Community
 | mariadb.mariadb | object | `{"database":"lsst_iam","enabled":true}` | MariaDB core configuration |
 | mariadb.mariadb.database | string | `"lsst_iam"` | Database name |
 | mariadb.mariadb.enabled | bool | `true` | Enable MariaDB |
-| mariadb.persistentvolume | object | `{"class":"standard","create":false,"reclaimPolicy":"Retain","size":"5Gi"}` | Persistent volume configuration |
+| mariadb.persistentvolume | object | `{"class":"","create":false,"reclaimPolicy":"Retain","size":"5Gi"}` | Persistent volume configuration |
 | mariadb.replicaCount | int | `1` | Number of replicas |
 | mariadb.resources | object | `{"limits":{"cpu":"1","memory":"256Mi"},"requests":{"cpu":"500m","memory":"128Mi"}}` | Resource requests and limits |
 | oidc | object | `{"enabled":false}` | OIDC configuration |
-| persistentvolume | object | `{"class":"standard","create":true,"path":"/mnt/iam-logs","size":"5Gi"}` | Persistent volume configuration |
-| persistentvolume.class | string | `"standard"` | Storage class for the persistent volume |
-| persistentvolume.create | bool | `true` | Whether to create a persistent volume |
-| persistentvolume.size | string | `"5Gi"` | Size of the persistent volume |
 | redis | object | See the `values.yaml` file. | Redis configuration |
 | redis.enabled | bool | `true` | Enable Redis |
+| redis.persistence | object | `{"storageClass":""}` | Persistent storage configuration |
+| redis.persistence.storageClass | string | Cluster default | Storage class for the Redis PVC |
 | redis.service | object | `{"enabled":true}` | Service configuration |
 | replicaCount | int | `3` | Number of replicas |
 | resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"1","memory":"1.5Gi"}}` | Resource requests and limits |

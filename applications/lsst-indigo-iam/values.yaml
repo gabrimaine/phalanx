@@ -51,16 +51,6 @@ container:
   port: 8080
   portDebug: 1443
 
-# -- Persistent volume configuration
-persistentvolume:
-  # -- Whether to create a persistent volume
-  create: true
-  # -- Storage class for the persistent volume
-  class: "standard"
-  # -- Size of the persistent volume
-  size: 5Gi
-  path: "/mnt/iam-logs"
-
 # -- Resource requests and limits
 resources:
   requests:
@@ -153,7 +143,7 @@ mariadb:
   # -- Persistent volume configuration
   persistentvolume:
     create: false
-    class: "standard"
+    class: ""
     size: 5Gi
     reclaimPolicy: Retain
 
@@ -162,6 +152,12 @@ mariadb:
 redis:
   # -- Enable Redis
   enabled: true
+
+  # -- Persistent storage configuration
+  persistence:
+    # -- Storage class for the Redis PVC
+    # @default -- Cluster default
+    storageClass: ""
 
   # -- Service configuration
   service:
