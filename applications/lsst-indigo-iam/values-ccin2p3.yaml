@@ -1,9 +1,8 @@
 ingress:
-  host: "data-dev.lsst.eu"
-  path: "/iam"
+  host: "iam.data-dev.lsst.eu"
 
 iam:
-  host: "data-dev.lsst.eu/iam"
+  host: "iam.data-dev.lsst.eu"
   token:
     includeScope: "true"
 

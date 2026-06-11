@@ -21,8 +21,7 @@ Indigo-IAM for LSST Community
 | iam.redis | object | `{"host":"redis-svc","port":6379}` | Redis connection for the IAM service |
 | image | object | `{"pullPolicy":"IfNotPresent","repository":"indigoiam/iam-login-service","tag":"v1.12.3"}` | Image configuration |
 | image.tag | string | `"v1.12.3"` | Tag of the IAM login service image to use |
-| ingress | object | `{"enabled":true,"host":null,"path":"/"}` | Ingress configuration |
-| ingress.path | string | `"/"` | Path prefix for the ingress |
+| ingress | object | `{"enabled":true,"host":null}` | Ingress configuration |
 | mail | object | `{"host":"zrelay.in2p3.fr","port":"25","secretName":"mail-secret"}` | Mail configuration |
 | mariadb | object | See the `values.yaml` file. | MariaDB configuration |
 | mariadb.image | object | `{"tag":"11.4"}` | Image configuration |
