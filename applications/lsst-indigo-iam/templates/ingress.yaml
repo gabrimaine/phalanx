@@ -4,6 +4,9 @@ kind: Ingress
 metadata:
   name: {{ include "lsst-indigo-iam.fullname" . }}
   labels: {{- include "lsst-indigo-iam.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   ingressClassName: "nginx"
   rules:

@@ -2,11 +2,9 @@ ingress:
   host: "lsst-iam.data-dev.lsst.eu"
 
 iam:
+  host: "lsst-iam.data-dev.lsst.eu"
   token:
     includeScope: "true"
-
-persistentvolume:
-  class: "rsp-local-storage"
 
 mail:
   host: "zrelay.in2p3.fr"
