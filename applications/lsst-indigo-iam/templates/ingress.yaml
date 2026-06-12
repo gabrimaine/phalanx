@@ -47,3 +47,4 @@ spec:
                 name: {{ .Values.global.iam.serviceName }}
                 port:
                   number: {{ .Values.container.port }}
+{{- end }}
