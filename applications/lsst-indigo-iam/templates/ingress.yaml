@@ -10,16 +10,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     {{- if $isSubPath }}
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      # Handle the /iam prefix properly
-      location {{ $path | quote }}{
-        proxy_pass http://iam-svc:8080/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Prefix {{ $path | quote }};
-      }
     nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ $path | quote }}
     {{- end }}
 spec:
