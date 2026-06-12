@@ -48,7 +48,7 @@ image:
 
 # -- Container port configuration
 container:
-  port: 8085
+  port: 8080
   portDebug: 1443
 
 # -- Resource requests and limits

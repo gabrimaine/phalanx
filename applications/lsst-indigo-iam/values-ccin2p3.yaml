@@ -1,9 +1,11 @@
 ingress:
   host: "data-dev.lsst.eu"
   path: "/iam"
-
+container:
+  port: 8085
 iam:
   host: "data-dev.lsst.eu/iam"
+  port: 8085
   security:
     forwardHeaders: "framework"
   token:
