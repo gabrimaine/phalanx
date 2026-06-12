@@ -6,7 +6,7 @@ Indigo-IAM for LSST Community
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| container | object | `{"port":8080,"portDebug":1443}` | Container port configuration |
+| container | object | `{"port":8085,"portDebug":1443}` | Container port configuration |
 | database | object | `{"host":"mariadb-svc","name":"lsst_iam","port":3306,"secretName":"mariadb-secret"}` | Database configuration |
 | global | object | `{"baseUrl":null,"environmentName":null,"host":null,"iam":{"ingress":{"serviceName":"iam-ingress"},"serviceName":"iam-svc"},"mariadb":{"serviceName":"mariadb-svc"},"redis":{"host":"localhost","port":6379,"serviceName":"redis-svc"},"repertoireUrl":null,"vaultSecretsPath":null}` | Global configuration shared across subcharts |
 | global.baseUrl | string | `nil` | Base URL for the environment |
