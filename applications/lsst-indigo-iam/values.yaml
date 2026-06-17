@@ -89,7 +89,7 @@ iam:
   tokenValidity: 259200
   javaOpts: "-Dspring.profiles.active=prod,oidc,mysql,registration,redis"
   logo:
-    url: "https://doc.lsst.eu/_static/lsst-france-logo.png"
+    url: "https://noirlab.edu/public/media/archives/logos/original_trans/logo065.png"
   cache:
     redisEnabled: "true"
   session:
