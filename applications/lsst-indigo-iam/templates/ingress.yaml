@@ -13,10 +13,9 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     #nginx.ingress.kubernetes.io/configuration-snippet: |
     #  proxy_redirect ~^/(.*)$ /iam/$1;
-
-    {{- if $isSubPath }}
-    nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ $path | quote }}
-    {{- end }}
+    #{{- if $isSubPath }}
+    #nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ $path | quote }}
+    #{{- end }}
 spec:
   ingressClassName: "nginx"
   tls:
@@ -42,7 +41,7 @@ spec:
           #       port:
           #         number: {{ .Values.container.port }}
           - path: {{ printf "%s(/|$)(.*)" $path | quote }}
-            pathType: "ImplementationSpecific"
+            pathType: "Prefix"
             backend:
               service:
                 name: {{ .Values.global.iam.serviceName }}
