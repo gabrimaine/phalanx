@@ -76,10 +76,10 @@ spec:
               mountPath: /var/log/iam
           env:
            # spring boot config
-           - name: SERVER_USE_FORWARD_HEADERS
-             value: "true"
-           - name: SERVER_FORWARD_HEADERS_STRATEGY
-             value: "native"
+           #- name: SERVER_USE_FORWARD_HEADERS
+           #  value: "true"
+           #- name: SERVER_FORWARD_HEADERS_STRATEGY
+           #  value: "native"
            # Redis Config
            - name: IAM_SPRING_REDIS_HOST
              value: {{ .Values.iam.redis.host | quote }}
@@ -89,6 +89,10 @@ spec:
              value: {{ .Values.iam.redis.probeEnabled | default "true" | quote }}
 
            # IAM Core Config
+           - name: IAM_DASHBOARD_BASE_URL
+             value: "https://data-dev.lsst.eu"
+           - name: IAM_DASHBOARD_BASE_PATH
+             value: "iam"
            - name: IAM_BASE_URL
              value: "https://{{ .Values.iam.host }}" #:{{ .Values.iam.port }}"
            - name: IAM_PORT
