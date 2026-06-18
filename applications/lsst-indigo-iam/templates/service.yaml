@@ -4,6 +4,7 @@ metadata:
   name: {{ .Values.global.iam.serviceName }}
   labels: {{- include "lsst-indigo-iam.labels" . | nindent 4 }}
 spec:
+  type: LoadBalancer
   #clusterIP: None #ClusterIP
   selector:
     {{- include "lsst-indigo-iam.selectorLabels" . | nindent 6 }}

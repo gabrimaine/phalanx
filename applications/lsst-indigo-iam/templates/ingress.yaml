@@ -7,15 +7,21 @@ metadata:
   name: {{ include "lsst-indigo-iam.fullname" . }}
   labels: {{- include "lsst-indigo-iam.labels" . | nindent 4 }}
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    #nginx.ingress.kubernetes.io/configuration-snippet: |
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^/iam$ /iam/ permanent;
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/use-regex: 'true'
     #  proxy_redirect ~^/(.*)$ /iam/$1;
     {{- if $isSubPath }}
     nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ $path | quote }}
     {{- end }}
+    # Rewrite location header redirects from "/" to "/iam/"
+    nginx.ingress.kubernetes.io/proxy-redirect-from: "/"
+    nginx.ingress.kubernetes.io/proxy-redirect-to: "/iam/"
+    # Optional: Scope the session cookies to the /iam path
+    nginx.ingress.kubernetes.io/proxy-cookie-path: "/ /iam"
 spec:
   ingressClassName: "nginx"
   tls:
