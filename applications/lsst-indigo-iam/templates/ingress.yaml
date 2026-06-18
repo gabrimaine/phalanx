@@ -32,6 +32,7 @@ spec:
               service:
                 name: {{ .Values.global.iam.serviceName }}
                 port:
+                  number: {{ .Values.container.port }}
           - path: "/webjars/(.*)"
             pathType: "ImplementationSpecific"
             backend:
