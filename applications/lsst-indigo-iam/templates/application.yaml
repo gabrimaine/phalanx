@@ -75,7 +75,14 @@ spec:
             - name: iam-logs
               mountPath: /var/log/iam
           env:
+           # spring boot config
+           #- name: SERVER_USE_FORWARD_HEADERS
+           #  value: "true"
+           #- name: SERVER_FORWARD_HEADERS_STRATEGY
+           #  value: "native"
            # Redis Config
+           - name: SERVER_SERVLET_CONTEXT_PATH
+             value: "/iam"
            - name: IAM_SPRING_REDIS_HOST
              value: {{ .Values.iam.redis.host | quote }}
            - name: IAM_SPRING_REDIS_PORT

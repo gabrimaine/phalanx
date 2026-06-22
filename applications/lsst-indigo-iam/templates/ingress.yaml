@@ -26,4 +26,12 @@ spec:
                 name: {{ .Values.global.iam.serviceName }}
                 port:
                   number: {{ .Values.container.port }}
+          - path: {{ printf "%s(/start_registration)(.*)" $path | quote }}
+            pathType: "ImplementationSpecific"
+            backend:
+              service:
+                name: {{ .Values.global.iam.serviceName }}
+                port:
+                  number: {{ .Values.container.port }}
+
 {{- end }}

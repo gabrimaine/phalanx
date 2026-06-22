@@ -7,10 +7,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: "nginx"
-  tls:
-    - hosts:
-        - {{ required "ingress.host must be set" .Values.ingress.host | quote }}
-      secretName: tls-secret
   rules:
     - host: {{ required "ingress.host must be set" .Values.ingress.host | quote }}
       http:
