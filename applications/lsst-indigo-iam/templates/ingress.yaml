@@ -8,14 +8,11 @@ metadata:
   labels: {{- include "lsst-indigo-iam.labels" . | nindent 4 }}
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-set-headers: |
-      X-Forwarded-Proto: https
-      X-Forwarded-Port: 443
-      X-Forwarded-Host: {{ .Values.ingress.host }}
-      X-Forwarded-Prefix: /
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    nginx.ingress.kubernetes.io/forwarded-for: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- if $isSubPath }}
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ $path | quote }}
+    {{- end }}
 spec:
   ingressClassName: "nginx"
   rules:
@@ -23,7 +20,7 @@ spec:
       http:
         paths:
           - path: {{ printf "%s(/|$)(.*)" $path | quote }}
-            pathType: "Prefix"
+            pathType: "ImplementationSpecific"
             backend:
               service:
                 name: {{ .Values.global.iam.serviceName }}
