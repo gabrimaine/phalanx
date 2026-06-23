@@ -1,6 +1,6 @@
 ingress:
   host: "data-dev.lsst.eu"
-  path: "/iam"
+  #path: "/iam"
 container:
   port: 8085
 iam:
