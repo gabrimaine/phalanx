@@ -1,6 +1,6 @@
 ingress-nginx:
   controller:
-    images:
+    image:
       registry: "registry.hub.docker.com/cnafsd/nginx-httpg-voms"
       tag: "v1.30.3-1.2.2"
     nodeSelector:
