@@ -1,9 +1,5 @@
 ingress-nginx:
   controller:
-    image:
-      registry: "registry.hub.docker.com"
-      image: "cnafsd/nginx-httpg-voms"
-      tag: "v1.30.3-1.2.2"
     nodeSelector:
       kubernetes.io/hostname: "ccqserv202"
 
