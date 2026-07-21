@@ -260,7 +260,7 @@ spec:
         - name: voms-nginx
           image: "{{ .Values.voms.nginx.image.repository }}:{{ .Values.voms.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.voms.nginx.image.pullPolicy }}
-          args: ["-g", "pid /tmp/nginx.pid;"]
+          command: ["nginx", "-g", "pid /tmp/nginx.pid; daemon off;"]
           env:
             - name: X509_VOMS_DIR
               value: "/vomsdir"
