@@ -64,7 +64,7 @@ spec:
       {{- if .Values.voms.enabled }}
       initContainers:
         - name: init-voms-trust-anchors
-          image: "cnafsd/egi-trust-anchors:latest"
+          image: "indigoiam/egi-trustanchors:main"
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
@@ -74,7 +74,7 @@ spec:
             - name: voms-trust-anchors
               mountPath: /trust-anchors
         - name: init-vomsdir
-          image: "cnafsd/egi-trust-anchors:latest"
+          image: "indigoiam/egi-trustanchors:main"
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
