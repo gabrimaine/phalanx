@@ -39,6 +39,8 @@ spec:
                 path: keystore.jwks
         - name: temp-volume
           emptyDir: {}
+        - name: voms-nginx-cache
+          emptyDir: {}
         - name: iam-logs
           emptyDir: {}
         {{- if .Values.oidc.enabled }}
@@ -280,6 +282,8 @@ spec:
             - name: vomsdir
               mountPath: /vomsdir
               readOnly: true
+            - name: voms-nginx-cache
+              mountPath: /var/cache/nginx
         - name: voms-aa
           image: "{{ .Values.voms.image.repository }}:{{ .Values.voms.image.tag }}"
           imagePullPolicy: {{ .Values.voms.image.pullPolicy }}
