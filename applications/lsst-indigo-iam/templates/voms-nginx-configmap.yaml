@@ -16,8 +16,6 @@ data:
         ssl_verify_client on;
         ssl_verify_depth 10;
 
-#        vomsdir /vomsdir;
-
         location / {
             proxy_pass http://localhost:8080;
             proxy_set_header Host $host;
