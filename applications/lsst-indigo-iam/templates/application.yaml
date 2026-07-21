@@ -49,6 +49,46 @@ spec:
               - key: application-oidc.yaml
                 path: application-oidc.yaml
         {{- end }}
+        {{- if .Values.voms.enabled }}
+        - name: voms-host-cert
+          secret:
+            secretName: {{ .Values.voms.tls.certificateSecretName }}
+        - name: voms-trust-anchors
+          emptyDir: {}
+        - name: voms-nginx-conf
+          configMap:
+            name: {{ .Values.voms.nginx.configMapName }}
+        - name: vomsdir
+          emptyDir: {}
+        {{- end }}
+      {{- if .Values.voms.enabled }}
+      initContainers:
+        - name: init-voms-trust-anchors
+          image: "cnafsd/egi-trust-anchors:latest"
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cp -r /etc/grid-security/certificates/* /trust-anchors/
+          volumeMounts:
+            - name: voms-trust-anchors
+              mountPath: /trust-anchors
+        - name: init-vomsdir
+          image: "cnafsd/egi-trust-anchors:latest"
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              mkdir -p /vomsdir/{{ .Values.voms.voName }}
+              openssl x509 -in /certs/hostcert.pem -noout -subject -issuer -nameopt compat |
+                sed -e 's/^subject=//' -e 's/^issuer=//' > /vomsdir/{{ .Values.voms.voName }}/{{ .Values.voms.ingress.host }}.lsc
+          volumeMounts:
+            - name: voms-host-cert
+              mountPath: /certs
+              readOnly: true
+            - name: vomsdir
+              mountPath: /vomsdir
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -208,4 +248,72 @@ spec:
                  name: {{ .Values.oidc.secretName | default "oidc-client-secret" }}
                  key: clientSecret
             {{- end }}
-
+        {{- if .Values.voms.enabled }}
+        - name: voms-nginx
+          image: "{{ .Values.voms.nginx.image.repository }}:{{ .Values.voms.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.voms.nginx.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.voms.nginx.resources | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.voms.nginx.port }}
+              name: voms-https
+              protocol: TCP
+          volumeMounts:
+            - name: voms-host-cert
+              mountPath: /certs
+              readOnly: true
+            - name: voms-trust-anchors
+              mountPath: /etc/grid-security/certificates
+              readOnly: true
+            - name: voms-nginx-conf
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+            - name: vomsdir
+              mountPath: /vomsdir
+              readOnly: true
+        - name: voms-aa
+          image: "{{ .Values.voms.image.repository }}:{{ .Values.voms.image.tag }}"
+          imagePullPolicy: {{ .Values.voms.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.voms.resources | nindent 12 }}
+          ports:
+            - containerPort: 8080
+              name: voms-aa-http
+              protocol: TCP
+          volumeMounts:
+            - name: voms-host-cert
+              mountPath: /etc/grid-security/voms
+              readOnly: true
+            - name: voms-trust-anchors
+              mountPath: /etc/grid-security/certificates
+              readOnly: true
+          env:
+            - name: VOMS_AA_VONAME
+              value: {{ .Values.voms.voName | quote }}
+            - name: VOMS_AA_FORWARD_HEADERS_STRATEGY
+              value: {{ .Values.voms.forwardHeadersStrategy | quote }}
+            - name: VOMS_AA_OPTIONAL_GROUP_LABEL
+              value: {{ .Values.voms.optionalGroupLabel | quote }}
+            - name: VOMS_AA_VOMS_ROLE_LABEL
+              value: {{ .Values.voms.vomsRoleLabel | quote }}
+            - name: VOMS_AA_USE_LEGACY_FQAN_ENCODING
+              value: {{ .Values.voms.useLegacyFqanEncoding | quote }}
+            - name: VOMS_AA_TLS_CERTIFICATE_PATH
+              value: "/etc/grid-security/voms/hostcert.pem"
+            - name: VOMS_AA_TLS_PRIVATE_KEY_PATH
+              value: "/etc/grid-security/voms/hostkey.pem"
+            - name: VOMS_AA_TLS_TRUST_ANCHORS_DIR
+              value: {{ .Values.voms.tls.trustAnchorsDir | quote }}
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://{{ .Values.voms.db.host }}:{{ .Values.voms.db.port }}/{{ .Values.voms.db.name }}?useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.voms.db.secretName }}
+                  key: user
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.voms.db.secretName }}
+                  key: user-password
+        {{- end }}

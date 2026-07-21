@@ -73,11 +73,61 @@ ingress:
 oidc:
   enabled: false
 
-# -- Mail configuration
 mail:
   host: "zrelay.in2p3.fr"
   port: "25"
   secretName: "mail-secret"
+# -- VOMS service configuration
+voms:
+  enabled: false
+  image:
+    repository: "indigoiam/iam-voms-aa"
+    tag: "v1.14.1"
+    pullPolicy: IfNotPresent
+  voName: "lsst"
+
+  # -- VOMS NGINX (cnafsd/nginx-httpg-voms)
+  nginx:
+    image:
+      repository: "cnafsd/nginx-httpg-voms"
+      tag: "latest"
+      pullPolicy: IfNotPresent
+    port: 10443
+    configMapName: "voms-nginx-conf"
+    ingress:
+      host: null
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+
+  # -- Spring Boot config for VOMS AA
+  forwardHeadersStrategy: "native"
+  optionalGroupLabel: "wlcg.optional-group"
+  vomsRoleLabel: "voms.role"
+  useLegacyFqanEncoding: false
+
+  tls:
+    certificateSecretName: "voms-host-cert-secret"
+    trustAnchorsDir: "/etc/grid-security/certificates"
+    trustAnchorsRefreshIntervalSecs: 14400
+
+  db:
+    host: "mariadb-svc"
+    port: 3306
+    name: "lsst_iam"
+    secretName: "mariadb-secret"
+
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
 
 # -- IAM service core configuration
 iam:

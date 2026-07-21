@@ -10,7 +10,10 @@ iam:
     forwardHeaders: "framework"
   token:
     includeScope: "true"
-
+voms:
+  enabled: true
+  ingress:
+    host: "iam.data-dev.lsst.eu"
 mail:
   host: "zrelay.in2p3.fr"
   port: "25"

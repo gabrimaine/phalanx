@@ -13,3 +13,9 @@ spec:
     targetPort: {{ .Values.container.port }}
     protocol: TCP
     name: iam-login-service-port
+  {{- if .Values.voms.enabled }}
+  - port: {{ .Values.voms.nginx.port }}
+    targetPort: {{ .Values.voms.nginx.port }}
+    protocol: TCP
+    name: voms-https
+  {{- end }}

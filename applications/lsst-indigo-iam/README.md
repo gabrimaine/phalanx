@@ -22,7 +22,9 @@ Indigo-IAM for LSST Community
 | image | object | `{"pullPolicy":"IfNotPresent","repository":"indigoiam/iam-login-service","tag":"v1.12.3"}` | Image configuration |
 | image.tag | string | `"v1.12.3"` | Tag of the IAM login service image to use |
 | ingress | object | `{"enabled":true,"host":null}` | Ingress configuration |
-| mail | object | `{"host":"zrelay.in2p3.fr","port":"25","secretName":"mail-secret"}` | Mail configuration |
+| mail.host | string | `"zrelay.in2p3.fr"` |  |
+| mail.port | string | `"25"` |  |
+| mail.secretName | string | `"mail-secret"` |  |
 | mariadb | object | See the `values.yaml` file. | MariaDB configuration |
 | mariadb.image | object | `{"tag":"11.4"}` | Image configuration |
 | mariadb.image.tag | string | `"11.4"` | Tag of the MariaDB image to use |
@@ -41,3 +43,6 @@ Indigo-IAM for LSST Community
 | replicaCount | int | `3` | Number of replicas |
 | resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"1","memory":"1.5Gi"}}` | Resource requests and limits |
 | securityContext | object | `{"runAsUser":"1003790000"}` | Security context |
+| voms | object | `{"db":{"host":"mariadb-svc","name":"lsst_iam","port":3306,"secretName":"mariadb-secret"},"enabled":false,"forwardHeadersStrategy":"native","image":{"pullPolicy":"IfNotPresent","repository":"indigoiam/iam-voms-aa","tag":"v1.14.1"},"nginx":{"configMapName":"voms-nginx-conf","image":{"pullPolicy":"IfNotPresent","repository":"cnafsd/nginx-httpg-voms","tag":"latest"},"ingress":{"host":null},"port":10443,"resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}},"optionalGroupLabel":"wlcg.optional-group","resources":{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":"250m","memory":"512Mi"}},"tls":{"certificateSecretName":"voms-host-cert-secret","trustAnchorsDir":"/etc/grid-security/certificates","trustAnchorsRefreshIntervalSecs":14400},"useLegacyFqanEncoding":false,"voName":"lsst","vomsRoleLabel":"voms.role"}` | VOMS service configuration |
+| voms.forwardHeadersStrategy | string | `"native"` | Spring Boot config for VOMS AA |
+| voms.nginx | object | `{"configMapName":"voms-nginx-conf","image":{"pullPolicy":"IfNotPresent","repository":"cnafsd/nginx-httpg-voms","tag":"latest"},"ingress":{"host":null},"port":10443,"resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}}` | VOMS NGINX (cnafsd/nginx-httpg-voms) |
