@@ -12,7 +12,7 @@ data:
 
         ssl_certificate     /certs/hostcert.pem;
         ssl_certificate_key /certs/hostkey.pem;
-        ssl_client_certificate /etc/grid-security/certificates;
+        ssl_client_certificate /etc/grid-security/certificates/ca-bundle.crt;
         ssl_verify_client on;
         ssl_verify_depth 10;
 

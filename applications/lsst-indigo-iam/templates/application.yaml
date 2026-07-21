@@ -75,6 +75,7 @@ spec:
           args:
             - |
               cp -r /etc/grid-security/certificates/* /trust-anchors/
+              find /trust-anchors -type f -name "*.pem" -exec cat {} \; > /trust-anchors/ca-bundle.crt
           volumeMounts:
             - name: voms-trust-anchors
               mountPath: /trust-anchors
