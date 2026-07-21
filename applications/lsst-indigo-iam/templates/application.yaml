@@ -288,7 +288,7 @@ spec:
             - name: voms-nginx-cache
               mountPath: /var/cache/nginx
             - name: voms-nginx-run
-              mountPath: /run/nginx
+              mountPath: /run/
         - name: voms-aa
           image: "{{ .Values.voms.image.repository }}:{{ .Values.voms.image.tag }}"
           imagePullPolicy: {{ .Values.voms.image.pullPolicy }}
