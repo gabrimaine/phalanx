@@ -39,8 +39,6 @@ spec:
                 path: keystore.jwks
         - name: temp-volume
           emptyDir: {}
-        - name: voms-nginx-cache
-          emptyDir: {}
         - name: iam-logs
           emptyDir: {}
         {{- if .Values.oidc.enabled }}
@@ -52,6 +50,10 @@ spec:
                 path: application-oidc.yaml
         {{- end }}
         {{- if .Values.voms.enabled }}
+        - name: voms-nginx-run
+          emptyDir: {}
+        - name: voms-nginx-cache
+          emptyDir: {}
         - name: voms-host-cert
           secret:
             secretName: {{ .Values.voms.tls.certificateSecretName }}
@@ -260,7 +262,7 @@ spec:
         - name: voms-nginx
           image: "{{ .Values.voms.nginx.image.repository }}:{{ .Values.voms.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.voms.nginx.image.pullPolicy }}
-          command: ["nginx", "-g", "pid /tmp/nginx.pid; daemon off;"]
+          command: ["nginx", "-g", "daemon off;"]
           env:
             - name: X509_VOMS_DIR
               value: "/vomsdir"
@@ -285,6 +287,8 @@ spec:
               readOnly: true
             - name: voms-nginx-cache
               mountPath: /var/cache/nginx
+            - name: voms-nginx-run
+              mountPath: /run/nginx
         - name: voms-aa
           image: "{{ .Values.voms.image.repository }}:{{ .Values.voms.image.tag }}"
           imagePullPolicy: {{ .Values.voms.image.pullPolicy }}
