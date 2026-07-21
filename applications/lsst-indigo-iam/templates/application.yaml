@@ -53,6 +53,11 @@ spec:
         - name: voms-host-cert
           secret:
             secretName: {{ .Values.voms.tls.certificateSecretName }}
+            items:
+              - key: voms-hostcert.pem
+                path: hostcert.pem
+              - key: voms-hostkey.pem
+                path: hostkey.pem
         - name: voms-trust-anchors
           emptyDir: {}
         - name: voms-nginx-conf
