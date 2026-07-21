@@ -252,6 +252,9 @@ spec:
         - name: voms-nginx
           image: "{{ .Values.voms.nginx.image.repository }}:{{ .Values.voms.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.voms.nginx.image.pullPolicy }}
+          env:
+            - name: X509_VOMS_DIR
+              value: "/vomsdir"
           resources:
             {{- toYaml .Values.voms.nginx.resources | nindent 12 }}
           ports:
