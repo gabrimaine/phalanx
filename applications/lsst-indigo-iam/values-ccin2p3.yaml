@@ -13,7 +13,7 @@ iam:
 voms:
   enabled: true
   ingress:
-    host: "data.lsst.eu"
+    host: "ccqserv202.in2p3.fr"
 mail:
   host: "zrelay.in2p3.fr"
   port: "25"
