@@ -19,8 +19,8 @@ Indigo-IAM for LSST Community
 | global.vaultSecretsPath | string | `nil` | Base path for Vault secrets |
 | iam | object | `{"cache":{"redisEnabled":"true"},"host":null,"javaOpts":"-Dspring.profiles.active=prod,oidc,mysql,registration,redis","jwt":"wlcg","logo":{"url":"https://noirlab.edu/public/media/archives/logos/screen/logo070.jpg"},"organisation":"Vera C. Rubin Observatory","port":8080,"redis":{"host":"redis-svc","port":6379},"security":{"forwardHeaders":"native"},"session":{"storeType":"redis"},"token":{"includeAuthnInfo":"false","includeNbf":"false","includeScope":"true","scopes":"openid profile email"},"tokenValidity":259200,"topbar":"INDIGO IAM for Rubin Observatory Community"}` | IAM service core configuration |
 | iam.redis | object | `{"host":"redis-svc","port":6379}` | Redis connection for the IAM service |
-| image | object | `{"pullPolicy":"IfNotPresent","repository":"indigoiam/iam-login-service","tag":"v1.12.3"}` | Image configuration |
-| image.tag | string | `"v1.12.3"` | Tag of the IAM login service image to use |
+| image | object | `{"pullPolicy":"IfNotPresent","repository":"indigoiam/iam-login-service","tag":"v1.14.1"}` | Image configuration |
+| image.tag | string | `"v1.14.1"` | Tag of the IAM login service image to use |
 | ingress | object | `{"enabled":true,"host":null}` | Ingress configuration |
 | mail.host | string | `"zrelay.in2p3.fr"` |  |
 | mail.port | string | `"25"` |  |
