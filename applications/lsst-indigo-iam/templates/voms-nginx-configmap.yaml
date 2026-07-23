@@ -21,7 +21,6 @@ data:
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto https;
-            # Standard TLS client info
             proxy_set_header X-SSL-Client-Serial      $ssl_client_serial;
             proxy_set_header X-SSL-Client-S-Dn        $ssl_client_s_dn;
             proxy_set_header X-SSL-Client-I-Dn        $ssl_client_i_dn;
@@ -29,8 +28,6 @@ data:
             proxy_set_header X-SSL-Client-V-End       $ssl_client_v_end;
             proxy_set_header X-SSL-Client-Verify      $ssl_client_verify;
             proxy_set_header X-SSL-Client-Cert        $ssl_client_escaped_cert;
-
-            # End Entity cert info (from ngx_http_voms_module)
             proxy_set_header X-SSL-Client-EE-Cert     $ssl_client_ee_cert;
             proxy_set_header X-SSL-Client-EE-S-Dn     $ssl_client_ee_s_dn;
             proxy_set_header X-SSL-Client-EE-I-Dn     $ssl_client_ee_i_dn;
