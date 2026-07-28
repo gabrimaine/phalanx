@@ -1,0 +1,23 @@
+ingress-nginx:
+  controller:
+    nodeSelector:
+      kubernetes.io/hostname: "ccqserv202"
+
+    tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "qserv"
+        effect: "NoSchedule"
+
+    service:
+      externalIPs:
+        - 134.158.237.2
+      type: NodePort
+    admissionWebhooks:
+      enabled: false
+    extraArgs:
+      default-ssl-certificate: ingress-nginx/ingress-certificate
+      enable-ssl-passthrough: true
+
+vaultCertificate:
+  enabled: true

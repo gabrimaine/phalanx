@@ -1,0 +1,17 @@
+name: ccin2p3voms
+fqdn: iam.data-dev.lsst.eu
+vaultPathPrefix: secret/phalanx/ccin2p3
+
+applications:
+  lsst-indigo-iam: true
+  nublado: false
+  portal: false
+  postgres: false
+  semaphore: false
+  squareone: false
+  tap: false
+  mobu: false
+
+  # datalinker disabled because it requires the Butler server, which is not
+  # enabled or configured.
+  datalinker: false

@@ -1,0 +1,30 @@
+ingress:
+  host: "iam.data-dev.lsst.eu"
+  #path: "/iam"
+container:
+  port: 8085
+iam:
+  host: "iam.data-dev.lsst.eu"
+  port: 8085
+  security:
+    forwardHeaders: "framework"
+  token:
+    includeScope: "true"
+voms:
+  enabled: true
+  ingress:
+    host: "voms.data-dev.lsst.eu"
+mail:
+  host: "zrelay.in2p3.fr"
+  port: "25"
+  secretName: "mail-secret"
+
+mariadb:
+  persistentvolume:
+    create: false
+    class: "mariadb-local-storage"
+    size: 5Gi
+    reclaimPolicy: Retain
+redis:
+  persistence:
+    storageClass: "redis-rsp-localstorage"
