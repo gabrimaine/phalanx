@@ -1092,6 +1092,7 @@ class ConfigStorage:
         environment_secrets = {}
         for path in base_path.glob("secrets-*.yaml"):
             env_name = path.stem[len("secrets-") :]
+            print(path)
             with path.open("r") as fh:
                 raw_secrets = yaml.safe_load(fh)
             environment_secrets[env_name] = {
